@@ -1,4 +1,6 @@
-// # LangArena (amalgamated, self-contained C version)
+// # C Stress Test (https://github.com/kostya/index-c)
+
+// A single-file, self-contained stress test for C compilers and optimizers.
 
 // This is an amalgamated/simplified version of the LangArena benchmark
 // (https://github.com/kostya/LangArena) for the C language.
