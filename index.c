@@ -40,7 +40,7 @@
 // on my machine. That is, the total time is approximately 50 seconds (but
 // results may differ on other hardware).
 
-// MIT License
+// MIT License Makarchev Konstantin
 
 #include <pthread.h>
 #include <stddef.h>
