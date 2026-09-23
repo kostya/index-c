@@ -41,7 +41,7 @@ COMPILERS = {
   'teeks99/clang-ubuntu' => ['2026-08-25'],
 }
 
-OPT_FLAGS = %w[-O0 -O1 -O2 -O3].freeze
+OPT_FLAGS = %w[-O0 -O1 -O2 -O3]
 SRC       = 'index.c'
 
 def clean_version(raw)
