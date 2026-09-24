@@ -23,7 +23,7 @@ results may differ on other hardware).
     gcc -Wno-format index.c -O3 -lm -o ./index
     ./index
 
-## How GCC and Clang performance changed over 10 years: my experiment
+# How GCC and Clang performance changed over 10 years: my experiment
 
 I’ve always been fascinated by the history of compilers. So I compiled the same C index-c with GCC from 4 to 16 and Clang from 3 to 23 to see how compilers evolved.
 
