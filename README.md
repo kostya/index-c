@@ -25,7 +25,7 @@ results may differ on other hardware).
 
 ## How GCC and Clang performance changed over 10 years: my experiment
 
-I’ve always been fascinated by the history of compilers. So I compiled the same C benchmark(index-c) with GCC from 4 to 16 and Clang from 3 to 23 to see how compilers evolved.
+I’ve always been fascinated by the history of compilers. So I compiled the same C index-c with GCC from 4 to 16 and Clang from 3 to 23 to see how compilers evolved.
 
 For this I used an amalgamated version of the LangArena benchmark - which contains 50 different tests. I picked it because it tests complex real-world problems rather than synthetic loops or microbenchmarks. This benchmark produces real work that can’t be eliminated by DCE or reduced to a simple vectorized loop.
 
