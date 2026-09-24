@@ -23,7 +23,7 @@ results may differ on other hardware).
     gcc -Wno-format index.c -O3 -lm -o ./index
     ./index
 
-# How GCC and Clang performance changed over 10 years: my experiment
+# ~~How GCC and Clang performance changed over 10 years: my experiment~~
 
 People are writing to me and saying that the slowdown GCC compilation doesn't reproduce - it seems to be a specific bug with my platform/Docker or some other conditions and instability. I decided to delete the post so as not to mislead people. I apologize for the trouble.
 
