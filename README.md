@@ -25,9 +25,11 @@ results may differ on other hardware).
 
 ## GCC and Clang: 10 years history
 
+To run test:
+
     ruby run.rb 
 
-Results in [history.js]
+Results in [history.js](https://github.com/kostya/index-c/blob/master/history.js)
 
 ![plot](plot_runtime.png)
 
@@ -43,7 +45,8 @@ Conclusion for Clang -O3 over 10 years:
 
 All benchmarks were run 24 September 2026 on Ryzen 3800X, Ubuntu 24.04 (kernel 7.0.0-30-generic), Docker 28.3.2.
 
-### Includes:
+
+### Source includes:
 
 * https://github.com/DaveGamble/cJSON
   MIT License (Copyright (c) 2009-2017 Dave Gamble and cJSON contributors)
@@ -57,6 +60,5 @@ All benchmarks were run 24 September 2026 on Ryzen 3800X, Ubuntu 24.04 (kernel 7
 
 * https://github.com/wareya/Remimu/
   Creative Commons Legal Code
-
 
 ### MIT License
