@@ -36,12 +36,12 @@ Results in [history.js](https://github.com/kostya/index-c/blob/master/history.js
 ![plot](plot_compile.png)
 
 Conclusion for GCC -O3 over 12 years:
-* GCC Runtime sped up by 5% (62.22s -> 59.13s). 
-* GCC Compile time slowed down by 66% (2.89s -> 4.82s).
+* Runtime sped up by 5% (62.22s -> 59.13s). 
+* Compile time slowed down by 66% (2.89s -> 4.82s).
 
 Conclusion for Clang -O3 over 10 years:
-* Clang Runtime sped up by 8% (56.41s -> 52.15s).
-* Clang Compile time sped up by 4% (2.29s -> 2.19s).
+* Runtime sped up by 8% (56.41s -> 52.15s).
+* Compile time sped up by 4% (2.29s -> 2.19s).
 
 All benchmarks were run 24 September 2026 on Ryzen 3800X, Ubuntu 24.04 (kernel 7.0.0-30-generic), Docker 28.3.2.
 
