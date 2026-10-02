@@ -128,26 +128,35 @@ end
 
 array = []
 
+envs = []
 COMPILERS.each do |image, (date)|
   OPT_FLAGS.each do |flags|
-    print "#{image}: #{flags} ... "
-    res = run_one(image, flags)
-    unless res
-      puts "[ERROR]"
-      next
-    else
-      puts "[OK] (version=#{res[:version]}, compile=#{res[:compile_time].round(2)}s, " \
-           "runtime=#{res[:bench_time].round(2)}s, " \
-           "size=#{res[:binary_size]} -> #{res[:binary_size_stripped]} bytes)"
-    end
-
-    res[:image] = image
-    res[:release_date] = date
-    res[:flags] = flags
-
-    array << res
-    File.open("./history.js", "w") { |f| f.puts(array.to_json) }
+    envs << [image, date, flags]
   end
+end
+
+if ARGV[0] == "1"
+  envs.shuffle!
+end
+
+envs.each do |(image, date, flags)|
+  print "#{image}: #{flags} ... "
+  res = run_one(image, flags)
+  unless res
+    puts "[ERROR]"
+    next
+  else
+    puts "[OK] (version=#{res[:version]}, compile=#{res[:compile_time].round(2)}s, " \
+         "runtime=#{res[:bench_time].round(2)}s, " \
+         "size=#{res[:binary_size]} -> #{res[:binary_size_stripped]} bytes)"
+  end
+
+  res[:image] = image
+  res[:release_date] = date
+  res[:flags] = flags
+
+  array << res
+  File.open("./history.js", "w") { |f| f.puts(array.to_json) }
 end
 
 File.open("./history.js", "w") { |f| f.puts(array.to_json) }
