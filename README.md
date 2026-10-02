@@ -70,8 +70,6 @@ docker run --rm -v `pwd`:/src -w /src gcc:16 bash -c 'time gcc -Wno-format /src/
 ```
 real  0m4.948s
 
-I'm not drawing any conclusions from this, because these are results from my machine only - there could be other explanations. Even the official images could be built incorrectly or with different flags by mistake.
-
 Results for O0.
 
 ![plot](experiment/plot_runtime_O0.png)
