@@ -14,13 +14,12 @@ as a stress test for C compilers on its own, as well as for the optimizer.
 
 It also includes the config directly in this file.
 
-All parameters have been tuned so that each test runs for roughly > ~1 second
-on clang and my machine. That is, the total time is approximately 53 seconds (but
-results may differ on other hardware).
+All parameters have been tuned on GCC 15 -O2, so that each test runs for roughly > ~1 second
+on my machine. That is, the total time is approximately 53 seconds (but results may differ on other hardware).
 
 ### Build and run:
 
-    gcc -Wno-format index.c -O3 -lm -o ./index
+    gcc index.c -O3 -lm -lpthread -o ./index
     ./index
 
 ### Source includes:

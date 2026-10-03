@@ -70,7 +70,7 @@ def run_one(image, flags)
     #{cc} --version | head -1
     echo versionend
     echo compilestart
-    { time #{cc} -Wno-format -std=gnu11 #{flags} #{SRC} -lm -lpthread -o /tmp/index ; } 2>&1
+    { time #{cc} -std=gnu11 #{flags} #{SRC} -lm -lpthread -o /tmp/index ; } 2>&1
     echo compileend
     echo rawsize_start
     stat -c %s /tmp/index
