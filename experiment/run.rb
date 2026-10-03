@@ -41,7 +41,7 @@ COMPILERS = {
   'teeks99/clang-ubuntu' => ['2026-08-25'],
 }
 
-OPT_FLAGS = %w[-O0 -O1 -O2 -O3 -Os -Oz]
+OPT_FLAGS = ["-O0", "-O1", "-O2", "-O3", "-Os", "-Oz", "-Ofast", "-O3 -march=native"]
 SRC       = 'index.c'
 
 def clean_version(raw)
@@ -84,7 +84,7 @@ def run_one(image, flags)
 
   stdout, stderr, status = Open3.capture3(
     'docker', 'run', '--rm',
-    '-v', "#{Dir.pwd}:/app", '-w', '/app',
+    '-v', "#{Dir.pwd}/..:/app", '-w', '/app',
     image, 'bash', '-c', cmd
   )
 
