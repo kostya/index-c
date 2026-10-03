@@ -139,8 +139,8 @@ if ARGV[0] == "1"
   envs.shuffle!
 end
 
-envs.each do |(image, date, flags)|
-  print "#{image}: #{flags} ... "
+envs.each_with_index do |(image, date, flags), index|
+  print "[#{index + 1} from #{envs.size}] #{image}: #{flags} ... "
   res = run_one(image, flags)
   unless res
     puts "[ERROR]"
