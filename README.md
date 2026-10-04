@@ -60,12 +60,12 @@ Results for O1, O2, O3.
 Regarding the slowdown in GCC compile time, it is clearly reproducible with two simple commands (using the official GCC images):
 
 ```
-docker run --rm -v `pwd`:/src -w /src gcc:7 bash -c 'time gcc -Wno-format /src/index.c -O3 -lm -lpthread -o /tmp/index'
+docker run --rm -v `pwd`:/src -w /src gcc:7 bash -c 'time gcc /src/index.c -O3 -lm -lpthread -o /tmp/index'
 ```
 real  0m2.879s
 
 ```
-docker run --rm -v `pwd`:/src -w /src gcc:16 bash -c 'time gcc -Wno-format /src/index.c -O3 -lm -lpthread -o /tmp/index'
+docker run --rm -v `pwd`:/src -w /src gcc:16 bash -c 'time gcc /src/index.c -O3 -lm -lpthread -o /tmp/index'
 ```
 real  0m4.948s
 
