@@ -43,7 +43,7 @@ on my machine. That is, the total time is approximately 53 seconds (but results 
 
 I measured runtime, compilation time, and binary size for `index.c` across GCC 4.9–16.2 and Clang 3.9–23.1.3, using the flags `-O0`, `-O1`, `-O2`, `-O3`, `-Os`, `-Oz`, `-Ofast`, and `-O3 -march=native`.
 
-Rerun on 2026-10-02. The first post was deleted because I was doing several measurements and the results were jumping around, so I started doubting them and deleted the post. Now I've done several runs and averaged the results (shown as spread bands on the graphs). I also tuned the configuration for `index.c` so it wouldn't be too favored toward Clang. In the previous run, Clang was much faster on the `Base64::Encode` test - its baseline was 1s on Clang but 8s on GCC, which hurt GCC a lot. Now this test is calibrated against GCC 1s, and the summary time no longer has a big gap against Clang because of a single test.
+Rerun on 2026-10-04. The first post was deleted because I was doing several measurements and the results were jumping around, so I started doubting them and deleted the post. Now I've done several runs and averaged the results (shown as spread bands on the graphs). I also tuned the configuration for `index.c` so it wouldn't be too favored toward Clang. In the previous run, Clang was much faster on the `Base64::Encode` test - its baseline was 1s on Clang but 8s on GCC, which hurt GCC a lot. Now this test is calibrated against GCC 1s, and the summary time no longer has a big gap against Clang because of a single test.
 
 Keep in mind that these results are specific to my machine:
 
