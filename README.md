@@ -39,19 +39,28 @@ on my machine. That is, the total time is approximately 53 seconds (but results 
 
 ### MIT License
 
-# Experiment: How GCC and Clang performance changed over 10 years.
+# Experiment: GCC and Clang performance over 10 years. Version 2.
 
-I measured performance, compilation time, and binary size for index.c, across GCC 4–16 and Clang 3–23, with the flags O0, O1, O2, O3, Os, Oz, Ofast, O3(march=native).
+I measured runtime, compilation time, and binary size for `index.c` across GCC 4.9–16.2 and Clang 3.9–23.1.3, using the flags `-O0`, `-O1`, `-O2`, `-O3`, `-Os`, `-Oz`, `-Ofast`, and `-O3 -march=native`.
 
-Rerun on 2026-10-02. The first post was deleted because I was doing several measurements and the results were jumping around, so I started doubting the results and deleted it. Now I've done several runs and averaged the results (shown as spread bands on the graph). I also tuned configuraion for index.c not to be very faroved to clang (in previous run, clang was much faster on Base64::Encode benchark, and and it baseline was 1s on clang, but 8s on gcc, so it hurts gcc pretty much, now this benchmarks calibrated against gcc 1s.). Keep in mind that these results are specific to my machine: Ryzen 3800X, DDR4-64GB (3200), Ubuntu 26.04, Docker 29.8.1. They can differ greatly under other conditions. So I wouldn't recommend treating them as verified or official, or citing them in any sources, etc. This is just my experiment; whether to trust them or not is your choice. You can run the script below to easily reproduce it - it requires only Linux, Docker, and Ruby.
+Rerun on 2026-10-02. The first post was deleted because I was doing several measurements and the results were jumping around, so I started doubting them and deleted the post. Now I've done several runs and averaged the results (shown as spread bands on the graphs). I also tuned the configuration for `index.c` so it wouldn't be too favored toward Clang. In the previous run, Clang was much faster on the `Base64::Encode` test - its baseline was 1s on Clang but 8s on GCC, which hurt GCC a lot. Now this test is calibrated against GCC 1s, and the summary time no longer has a big gap against Clang because of a single test.
 
-The benchmarks are run using Docker, with the image pulled from Docker Hub. This can introduce uncertainty into the results, since each image may contain its own version of glibc and other unknowns. Compilation time can be affected by two additional factors: the compiler binaries may be statically or dynamically linked, and I/O in Docker container.
+Keep in mind that these results are specific to my machine:
 
-GCC: 4.9.4, 5.5.0, 6.5.0, 7.5.0, 8.5.0, 9.5.0, 10.5.0, 11.5.0, 12.5.0, 13.5.0, 14.4.0, 15.3.0, 16.2.0.
+- **CPU:** Ryzen 3800X
+- **RAM:** 64 GB DDR4-3200
+- **OS:** Ubuntu 26.04
+- **Docker:** 29.8.1
 
-Clang: 3.9.0, 4.0.0, 5.0.2, 6.0.1, 7.0.1, 8.0.0, 9.0.0, 10.0.1, 11.1.0, 12.0.1, 13.0.1, 14.0.6, 15.0.7, 16.0.6, 17.0.6, 18.1.8, 19.1.7, 20.1.8, 21.1.8, 22.1.8, 23.1.3.
+They will likely differ under other conditions, so I wouldn't recommend treating them as verified or official, or citing them in any source. This is just my experiment; whether to trust it is up to you. You can run the script below to reproduce it - it requires only Linux, Docker, and Ruby.
 
-Results for O1, O2, O3.
+The benchmarks are run using Docker, with images pulled from Docker Hub. This can introduce uncertainty into the results, since each image may contain its own version of glibc and other unknowns. Compilation time can be affected by two additional factors: the compiler binaries may be statically or dynamically linked, and I/O in the Docker container.
+
+**GCC:** 4.9.4, 5.5.0, 6.5.0, 7.5.0, 8.5.0, 9.5.0, 10.5.0, 11.5.0, 12.5.0, 13.5.0, 14.4.0, 15.3.0, 16.2.0.
+
+**Clang:** 3.9.0, 4.0.0, 5.0.2, 6.0.1, 7.0.1, 8.0.0, 9.0.0, 10.0.1, 11.1.0, 12.0.1, 13.0.1, 14.0.6, 15.0.7, 16.0.6, 17.0.6, 18.1.8, 19.1.7, 20.1.8, 21.1.8, 22.1.8, 23.1.3.
+
+### Results for `-O1`, `-O2`, `-O3`
 
 ![plot](experiment/plot1_runtime.png)
 
@@ -71,31 +80,28 @@ real  0m4.948s
 
 This is also confirmed by this source: https://github.com/lac-dcc/BenchGen/wiki/Comparing-gcc-versions#1 `Comparing version 5 and version 14, there is an increase of about 42% over a span of 9 years.`
 
-Results for O0.
+### Results for O0.
 
 ![plot](experiment/plot2_runtime.png)
 
 ![plot](experiment/plot2_compile.png)
 
-Results for binary size.
+### Results for binary size.
 
 ![plot](experiment/plot3_binary_size.png)
 
-Results for Os, Oz vs O2.
+### Results for Os, Oz vs O2.
 
 ![plot](experiment/plot4_runtime.png)
 
 ![plot](experiment/plot4_compile.png)
 
-Results for "-Ofast", "-O3 -march=native" vs O3.
+### Results for "-Ofast", "-O3 -march=native" vs O3.
 
 ![plot](experiment/plot5_runtime.png)
 
 ![plot](experiment/plot5_compile.png)
 
-* [experiment run by simple ruby script](https://github.com/kostya/index-c/blob/master/experiment/run.rb) (requires Linux, docker and ruby) 
+* [reproduce script](https://github.com/kostya/index-c/blob/master/experiment/run.rb)
 * [raw data](https://github.com/kostya/index-c/blob/master/experiment/merged.js)
-
-
-
 
