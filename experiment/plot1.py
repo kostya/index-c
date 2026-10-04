@@ -8,22 +8,18 @@ import matplotlib.pyplot as plt
 
 INPUT_JSON = "merged.js"
 
-FLAGS = ["-O1", "-O2", "-O3", "-Os", "-Oz"]
+FLAGS = ["-O1", "-O2", "-O3"]
 
 COMPILER_COLORS = {
     "gcc": {
-        "-O1": "#f1c40f",
-        "-O2": "#e67e22",
-        "-O3": "#c0392b",
-        "-Os": "#8e44ad",
-        "-Oz": "#5b2c6f",
+        "-O1": "#f39c12",
+        "-O2": "#c0392b",
+        "-O3": "#7b241c",
     },
     "clang": {
         "-O1": "#1abc9c",
         "-O2": "#2980b9",
         "-O3": "#1a5276",
-        "-Os": "#27ae60",
-        "-Oz": "#145a32",
     },
 }
 
@@ -31,8 +27,6 @@ FLAG_STYLES = {
     "-O1": {"linestyle": ":",  "marker": "o", "alpha": 0.7},
     "-O2": {"linestyle": "-",  "marker": "s", "alpha": 0.9},
     "-O3": {"linestyle": "-.", "marker": "^", "alpha": 1.0},
-    "-Os": {"linestyle": "--", "marker": "D", "alpha": 0.85},
-    "-Oz": {"linestyle": "-",  "marker": "v", "alpha": 1.0},
 }
 
 
@@ -86,10 +80,8 @@ def plot_combined(series, ylabel, title, output_path):
             values = [p[1] for p in points]
             halfs  = [p[2] for p in points]
 
-            if all(h == 0 for h in halfs):
-                continue
-
             color = COMPILER_COLORS[compiler][flag]
+            style = FLAG_STYLES[flag]
 
             lower = [v - h for v, h in zip(values, halfs)]
             upper = [v + h for v, h in zip(values, halfs)]
@@ -129,11 +121,7 @@ def plot_combined(series, ylabel, title, output_path):
     ax.set_ylabel(ylabel)
     ax.set_title(title, fontsize=13)
     ax.grid(True, alpha=0.3)
-    ax.legend(loc="best", ncol=2, fontsize=10, framealpha=0.9)
-
-    ax.yaxis.set_major_formatter(
-        plt.FuncFormatter(lambda x, _: f"{x/1024:.0f} KB")
-    )
+    ax.legend(loc="best", ncol=3, fontsize=10, framealpha=0.9)
 
     plt.tight_layout()
     plt.savefig(output_path, dpi=150)
@@ -144,28 +132,22 @@ def plot_combined(series, ylabel, title, output_path):
 def main():
     data = load_data(INPUT_JSON)
 
-    series_raw = build_series(
-        data,
-        metric="binary_size",
-        diff_key="binary_size_diff_pct",
-    )
+    # ---- runtime ----
+    series_run = build_series(data, metric="bench_time_avg", diff_key="bench_time_diff_pct")
     plot_combined(
-        series_raw,
-        ylabel="Binary size (raw)",
-        title="Binary size (raw): GCC vs Clang, all optimization flags",
-        output_path="plot_binary_size.png",
+        series_run,
+        ylabel="Runtime (seconds)",
+        title="Runtime: GCC vs Clang, O1,O2,O3 flags",
+        output_path="plot1_runtime.png",
     )
 
-    series_strip = build_series(
-        data,
-        metric="binary_size_stripped",
-        diff_key="binary_size_diff_pct",
-    )
+    # ---- compile time ----
+    series_comp = build_series(data, metric="compile_time_avg", diff_key="compile_time_diff_pct")
     plot_combined(
-        series_strip,
-        ylabel="Binary size (stripped)",
-        title="Binary size (stripped): GCC vs Clang, all optimization flags",
-        output_path="plot_binary_size_stripped.png",
+        series_comp,
+        ylabel="Compile time (seconds)",
+        title="Compile time: GCC vs Clang, O1,O2,O3 flags",
+        output_path="plot1_compile.png",
     )
 
 

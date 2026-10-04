@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 
 INPUT_JSON = "merged.js"
 
-FLAGS = ["-O2", "-Os", "-Oz"]
+FLAGS = ["-O3", "-Ofast", "-O3 -march=native"]
 
 COMPILER_COLORS = {
     "gcc":   "#c0392b",
@@ -16,9 +16,9 @@ COMPILER_COLORS = {
 }
 
 FLAG_STYLES = {
-    "-O2": {"linestyle": "-",  "marker": "o", "linewidth": 3.0, "alpha": 1.0,  "markersize": 7},
-    "-Os": {"linestyle": "--", "marker": "s", "linewidth": 1.8, "alpha": 0.85, "markersize": 6},
-    "-Oz": {"linestyle": ":",  "marker": "^", "linewidth": 1.8, "alpha": 0.85, "markersize": 6},
+    "-O3":               {"linestyle": "-",  "marker": "o", "linewidth": 3.0, "alpha": 1.0,  "markersize": 7},
+    "-Ofast":            {"linestyle": "--", "marker": "s", "linewidth": 1.8, "alpha": 0.85, "markersize": 6},
+    "-O3 -march=native": {"linestyle": ":",  "marker": "^", "linewidth": 1.8, "alpha": 0.85, "markersize": 6},
 }
 
 
@@ -79,7 +79,7 @@ def plot_combined(series, ylabel, title, output_path):
             lower = [v - h for v, h in zip(values, halfs)]
             upper = [v + h for v, h in zip(values, halfs)]
 
-            alpha = 0.12 if flag == "-O2" else 0.08
+            alpha = 0.12 if flag == "-O3" else 0.08
 
             ax.fill_between(
                 dates, lower, upper,
@@ -107,7 +107,7 @@ def plot_combined(series, ylabel, title, output_path):
                 markersize=style["markersize"],
                 alpha=style["alpha"],
                 label=f"{compiler.upper()} {flag}",
-                zorder=2 if flag == "-O2" else 3,
+                zorder=2 if flag == "-O3" else 3,
             )
 
     ax.set_xlabel("Release date")
@@ -130,8 +130,8 @@ def main():
     plot_combined(
         series_run,
         ylabel="Runtime (seconds)",
-        title="Runtime: -Os / -Oz vs -O2 (GCC and Clang)",
-        output_path="plot_runtime_OsOz_vs_O2.png",
+        title="Runtime: -Ofast / -O3 -march=native vs -O3 (GCC and Clang)",
+        output_path="plot5_runtime.png",
     )
 
     # ---- compile time ----
@@ -139,8 +139,8 @@ def main():
     plot_combined(
         series_comp,
         ylabel="Compile time (seconds)",
-        title="Compile time: -Os / -Oz vs -O2 (GCC and Clang)",
-        output_path="plot_compile_OsOz_vs_O2.png",
+        title="Compile time: -Ofast / -O3 -march=native vs -O3 (GCC and Clang)",
+        output_path="plot5_compile.png",
     )
 
 
