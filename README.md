@@ -41,7 +41,7 @@ on my machine. That is, the total time is approximately 53 seconds (but results 
 
 # Experiment: How GCC and Clang performance changed over 10 years.
 
-I measured performance, compilation time, and binary size for index.c, across GCC 4–16 and Clang 3–23, with the flags O0, O1, O2, O3, Os, Oz.
+I measured performance, compilation time, and binary size for index.c, across GCC 4–16 and Clang 3–23, with the flags O0, O1, O2, O3, Os, Oz, Ofast, O3(march=native).
 
 Rerun on 2026-10-02. The first post was deleted because I was doing several measurements and the results were jumping around, so I started doubting the results and deleted it. Now I've done several runs and averaged the results (shown as spread bands on the graph). Keep in mind that these results are specific to my machine: Ryzen 3800X, DDR4-64GB (3200), Ubuntu 26.04, Docker 29.8.1. They can differ greatly under other conditions. So I wouldn't recommend treating them as verified or official, or citing them in any sources, etc. This is just my experiment; whether to trust them or not is your choice. You can run the script below to easily reproduce it - it requires only Linux, Docker, and Ruby.
 
@@ -93,9 +93,6 @@ Results for "-Ofast", "-O3 -march=native" vs O3.
 
 * [experiment run by simple ruby script](https://github.com/kostya/index-c/blob/master/experiment/run.rb) (requires Linux, docker and ruby) 
 * [raw data](https://github.com/kostya/index-c/blob/master/experiment/merged.js)
-
-
-
 
 
 
