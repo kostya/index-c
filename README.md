@@ -43,9 +43,9 @@ on my machine. That is, the total time is approximately 53 seconds (but results 
 
 I measured performance, compilation time, and binary size for index.c, across GCC 4–16 and Clang 3–23, with the flags O0, O1, O2, O3, Os, Oz, Ofast, O3(march=native).
 
-Rerun on 2026-10-02. The first post was deleted because I was doing several measurements and the results were jumping around, so I started doubting the results and deleted it. Now I've done several runs and averaged the results (shown as spread bands on the graph). Keep in mind that these results are specific to my machine: Ryzen 3800X, DDR4-64GB (3200), Ubuntu 26.04, Docker 29.8.1. They can differ greatly under other conditions. So I wouldn't recommend treating them as verified or official, or citing them in any sources, etc. This is just my experiment; whether to trust them or not is your choice. You can run the script below to easily reproduce it - it requires only Linux, Docker, and Ruby.
+Rerun on 2026-10-02. The first post was deleted because I was doing several measurements and the results were jumping around, so I started doubting the results and deleted it. Now I've done several runs and averaged the results (shown as spread bands on the graph). I also tuned configuraion for index.c not to be very faroved to clang (in previous run, clang was much faster on Base64::Encode benchark, and and it baseline was 1s on clang, but 8s on gcc, so it hurts gcc pretty much, now this benchmarks calibrated against gcc 1s.). Keep in mind that these results are specific to my machine: Ryzen 3800X, DDR4-64GB (3200), Ubuntu 26.04, Docker 29.8.1. They can differ greatly under other conditions. So I wouldn't recommend treating them as verified or official, or citing them in any sources, etc. This is just my experiment; whether to trust them or not is your choice. You can run the script below to easily reproduce it - it requires only Linux, Docker, and Ruby.
 
-The benchmarks are run using Docker, with the image pulled from Docker Hub. This can also introduce uncertainty into the results, since each image may contain its own version of glibc and other unknowns. Compilation time, in particular, is affected by two additional factors: the compiler binaries may be statically or dynamically linked, and the results often have a wider spread because they depend on I/O in Docker.
+The benchmarks are run using Docker, with the image pulled from Docker Hub. This can introduce uncertainty into the results, since each image may contain its own version of glibc and other unknowns. Compilation time can be affected by two additional factors: the compiler binaries may be statically or dynamically linked, and I/O in Docker container.
 
 GCC: 4.9.4, 5.5.0, 6.5.0, 7.5.0, 8.5.0, 9.5.0, 10.5.0, 11.5.0, 12.5.0, 13.5.0, 14.4.0, 15.3.0, 16.2.0.
 
@@ -57,7 +57,7 @@ Results for O1, O2, O3.
 
 ![plot](experiment/plot1_compile.png)
 
-Regarding the slowdown in GCC compile time, I'm not sure it isn't a glitch in my setup, but it's clearly reproducible with two simple commands (using the official GCC images):
+Regarding the slowdown in GCC compile time, it is clearly reproducible with two simple commands (using the official GCC images):
 
 ```
 docker run --rm -v `pwd`:/src -w /src gcc:7 bash -c 'time gcc -Wno-format /src/index.c -O3 -lm -lpthread -o /tmp/index'
