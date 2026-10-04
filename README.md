@@ -53,9 +53,9 @@ Clang: 3.9.0, 4.0.0, 5.0.2, 6.0.1, 7.0.1, 8.0.0, 9.0.0, 10.0.1, 11.1.0, 12.0.1, 
 
 Results for O1, O2, O3.
 
-![plot](experiment/plot_runtime.png)
+![plot](experiment/plot1_runtime.png)
 
-![plot](experiment/plot_compile.png)
+![plot](experiment/plot1_compile.png)
 
 Regarding the slowdown in GCC compile time, I'm not sure it isn't a glitch in my setup, but it's clearly reproducible with two simple commands (using the official GCC images):
 
@@ -71,19 +71,25 @@ real  0m4.948s
 
 Results for O0.
 
-![plot](experiment/plot_runtime_O0.png)
+![plot](experiment/plot2_runtime.png)
 
-![plot](experiment/plot_compile_O0.png)
+![plot](experiment/plot2_compile.png)
 
 Results for binary size.
 
-![plot](experiment/plot_binary_size.png)
+![plot](experiment/plot3_binary_size.png)
 
 Results for Os, Oz vs O2.
 
-![plot](experiment/plot_runtime_OsOz_vs_O2.png)
+![plot](experiment/plot4_runtime.png)
 
-![plot](experiment/plot_compile_OsOz_vs_O2.png)
+![plot](experiment/plot4_compile.png)
+
+Results for "-Ofast", "-O3 -march=native" vs O3.
+
+![plot](experiment/plot5_runtime.png)
+
+![plot](experiment/plot5_compile.png)
 
 * [experiment run by simple ruby script](https://github.com/kostya/index-c/blob/master/experiment/run.rb) (requires Linux, docker and ruby) 
 * [raw data](https://github.com/kostya/index-c/blob/master/experiment/merged.js)
