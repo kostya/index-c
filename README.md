@@ -69,6 +69,8 @@ docker run --rm -v `pwd`:/src -w /src gcc:16 bash -c 'time gcc /src/index.c -O3 
 ```
 real  0m4.948s
 
+This is also confirmed by this source: https://github.com/lac-dcc/BenchGen/wiki/Comparing-gcc-versions#1 `Comparing version 5 and version 14, there is an increase of about 42% over a span of 9 years.`
+
 Results for O0.
 
 ![plot](experiment/plot2_runtime.png)
