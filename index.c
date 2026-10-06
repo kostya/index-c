@@ -1,45 +1,3 @@
-// # C Stress Test (https://github.com/kostya/index-c)
-
-// A single-file, self-contained stress test for C compilers and optimizers.
-
-// This is an amalgamated/simplified version of the LangArena benchmark
-// (https://github.com/kostya/LangArena) for the C language.
-
-// LangArena: A collection of 50 tasks across 24 languages - complex,
-// non-synthetic, and inspired by real-world problems (JSON, Base64, CSV,
-// neural networks, compression, maze A*, graph algorithms, sorting, hashing,
-// interpreters, parallel matmul, and more).
-
-// Fully "all in" - it has no external dependencies beyond the standard
-// libraries. That is, this file is completely self-contained and can be used
-// as a stress test for C compilers on its own, as well as for the optimizer.
-
-// Build:
-
-//     gcc -Wno-format index.c -O3 -lm -o ./index
-//     ./index
-
-// It includes the following third-party libraries:
-
-// * https://github.com/DaveGamble/cJSON
-//   MIT License (Copyright (c) 2009-2017 Dave Gamble and cJSON contributors)
-
-// * https://github.com/troydhanson/uthash
-//   Copyright (c) 2005-2026, Troy D. Hanson
-//   https://troydhanson.github.io/uthash/
-
-// * https://github.com/kokke/tiny-regex-c
-//   All material in this repository is in the public domain.
-
-// * https://github.com/wareya/Remimu/
-//   Creative Commons Legal Code
-
-// It also includes the config directly in this file.
-
-// All parameters have been tuned so that each test runs for roughly 1 second
-// on my machine. That is, the total time is approximately 50 seconds (but
-// results may differ on other hardware).
-
 // Copyright (c) 2026 'Konstantin Makarchev'
 
 // MIT License
@@ -63,6 +21,53 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+// ------------------------------------------------------------------------------------------------
+// # C Stress Test (https://github.com/kostya/index-c)
+
+// An amalgamated, simplified version of the [LangArena](https://github.com/kostya/LangArena)
+// suite for the C language.
+
+// LangArena is a collection of 50 real-world-inspired tasks: JSON, Base64, CSV,
+// neural networks, compression, maze A*, graph algorithms, sorting, hashing,
+// interpreters, parallel matmul, and more.
+
+// The file (index.c) serves three purposes at once:
+
+// - **Compiler stress test** - a single ~500 KB translation unit exercises the
+//   front end, optimizer, and back end.
+// - **Runtime benchmark** - each test runs for roughly a second, so the total
+//   runtime is around 52 seconds on my hardware.
+// - **Correctness verifier** - every test checks its result against a checksum.
+//   If any test fails, the program exits with code 1.
+
+// Fully "all in": no external dependencies beyond the standard libraries.
+
+// All parameters have been tuned for GCC 16 -O2. Timings may differ on other
+// hardware.
+
+// ### Build and run:
+
+//     gcc index.c -O3 -lm -lpthread -o ./index
+//     ./index
+
+// ### Fast run, only test checksums
+
+//     TEST=1 ./index
+
+// ### Source includes:
+
+// * https://github.com/DaveGamble/cJSON
+//   MIT License (Copyright (c) 2009-2017 Dave Gamble and cJSON contributors)
+
+// * https://github.com/troydhanson/uthash
+//   Copyright (c) 2005-2026, Troy D. Hanson
+//   https://troydhanson.github.io/uthash/
+
+// * https://github.com/kokke/tiny-regex-c
+//   All material in this repository is in the public domain.
+
+// * https://github.com/wareya/Remimu/
+//   Creative Commons Legal Code
 
 #include <pthread.h>
 #include <stddef.h>
@@ -6525,7 +6530,7 @@ REMIMU_FUNC_VISIBILITY int64_t regex_match(const RegexToken * tokens, const char
                 return -2;
             }
         }
-        IF_VERBOSE(printf("k: %u\ti: %zu\tl: %zu\tstack_n: %d\n", k, i, limit, stack_n);)
+        IF_VERBOSE(printf("k: %u\ti: %zu\tl: %d\tstack_n: %d\n", k, i, limit, stack_n);)
         _P_TEXT_HIGHLIGHTED();
         if (tokens[k].kind == REMIMU_KIND_CARET)
         {
@@ -8449,15 +8454,15 @@ static uint32_t buffer_hash_sha256_digest(uint8_t *data, int64_t size) {
                         0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19};
 
   for (int64_t i = 0; i < size; i++) {
-    uint32_t hash_idx = (uint32_t)(i & 7);
-    uint32_t *hash = &hashes[hash_idx];
+    uint32_t hash_idx = (uint32_t)(i % 8);
+    uint32_t hash = hashes[hash_idx];
 
-    uint32_t temp = (*hash << 5) + *hash;
+    uint32_t temp = (hash << 5) + hash;
     temp = temp + data[i];
-    *hash = temp;
+    hash = temp;
 
-    temp = *hash + (*hash << 10);
-    *hash = temp ^ (*hash >> 6);
+    temp = hash + (hash << 10);
+    hashes[hash_idx] = temp ^ (hash >> 6);
   }
 
   uint8_t result[32];
@@ -8480,6 +8485,9 @@ void BufferHashSHA256_prepare(Benchmark *self) {
 void BufferHashSHA256_run(Benchmark *self, int iteration_id) {
   (void)iteration_id;
   BufferHashSHA256Data *data = (BufferHashSHA256Data *)self->data;
+
+  uint8_t ch = (uint8_t)Helper_next_int(256);
+  data->base.data[Helper_next_int(data->base.size_val)] = ch;
 
   uint32_t hash_result =
       buffer_hash_sha256_digest(data->base.data, data->base.size_val);
@@ -8541,6 +8549,9 @@ void BufferHashCRC32_prepare(Benchmark *self) {
 void BufferHashCRC32_run(Benchmark *self, int iteration_id) {
   (void)iteration_id;
   BufferHashCRC32Data *data = (BufferHashCRC32Data *)self->data;
+
+  uint8_t ch = (uint8_t)Helper_next_int(256);
+  data->base.data[Helper_next_int(data->base.size_val)] = ch;
 
   uint32_t crc_result =
       buffer_hash_crc32_digest(data->base.data, data->base.size_val);
@@ -16022,6 +16033,9 @@ void register_all_benchmarks(void) {
 }
 
 int main(int argc, char *argv[]) {
+  int test = 0;
+  const char *test_str = getenv("TEST");
+  if (test_str != NULL && strcmp(test_str, "1") == 0) test = 1;
   struct timespec start_time;
   clock_gettime(CLOCK_REALTIME, &start_time);
   printf("start: %ld\n",
@@ -16031,15 +16045,15 @@ int main(int argc, char *argv[]) {
     "[\n"
     "  {\n"
     "    \"name\": \"Binarytrees::Obj\",\n"
-    "    \"checksum\": 37748700,\n"
-    "    \"depth\": 19,\n"
-    "    \"iterations\": 30\n"
+    "    \"checksum\": 33554416,\n"
+    "    \"depth\": 20,\n"
+    "    \"iterations\": 14\n"
     "  },\n"
     "  {\n"
     "    \"name\": \"Binarytrees::Arena\",\n"
-    "    \"checksum\": 113246181,\n"
-    "    \"depth\": 21,\n"
-    "    \"iterations\": 23\n"
+    "    \"checksum\": 209715175,\n"
+    "    \"depth\": 22,\n"
+    "    \"iterations\": 21\n"
     "  },\n"
     "  {\n"
     "    \"name\": \"Brainfuck::Array\",\n"
@@ -16059,113 +16073,113 @@ int main(int argc, char *argv[]) {
     "  },\n"
     "  {\n"
     "    \"name\": \"Matmul::Single\",\n"
-    "    \"checksum\": 2636317752,\n"
-    "    \"n\": 543,\n"
+    "    \"checksum\": 3579146284,\n"
+    "    \"n\": 538,\n"
     "    \"iterations\": 10\n"
     "  },\n"
     "  {\n"
     "    \"name\": \"Matmul::T4\",\n"
-    "    \"checksum\": 3406759060,\n"
-    "    \"n\": 850,\n"
+    "    \"checksum\": 3662487828,\n"
+    "    \"n\": 840,\n"
     "    \"iterations\": 10\n"
     "  },\n"
     "  {\n"
     "    \"name\": \"Matmul::T8\",\n"
-    "    \"checksum\": 2387257924,\n"
-    "    \"n\": 1051,\n"
+    "    \"checksum\": 2969416860,\n"
+    "    \"n\": 1045,\n"
     "    \"iterations\": 10\n"
     "  },\n"
     "  {\n"
     "    \"name\": \"Matmul::T16\",\n"
-    "    \"checksum\": 1960278388,\n"
-    "    \"n\": 1265,\n"
+    "    \"checksum\": 4279591000,\n"
+    "    \"n\": 1254,\n"
     "    \"iterations\": 10\n"
     "  },\n"
     "  {\n"
     "    \"name\": \"Base64::Encode\",\n"
-    "    \"checksum\": 3208476047,\n"
-    "    \"size\": 2700000,\n"
-    "    \"iterations\": 5000\n"
+    "    \"checksum\": 3284045721,\n"
+    "    \"size\": 580000,\n"
+    "    \"iterations\": 3100\n"
     "  },\n"
     "  {\n"
     "    \"name\": \"Base64::Decode\",\n"
-    "    \"checksum\": 2829431115,\n"
+    "    \"checksum\": 1627945169,\n"
     "    \"size\": 530000,\n"
-    "    \"iterations\": 4000\n"
+    "    \"iterations\": 4100\n"
     "  },\n"
     "  {\n"
     "    \"name\": \"Json::Generate\",\n"
-    "    \"checksum\": 120,\n"
-    "    \"coords\": 5500,\n"
-    "    \"iterations\": 100\n"
+    "    \"checksum\": 156,\n"
+    "    \"coords\": 4050,\n"
+    "    \"iterations\": 130\n"
     "  },\n"
     "  {\n"
     "    \"name\": \"Json::ParseDom\",\n"
-    "    \"checksum\": 4157826592,\n"
-    "    \"coords\": 11000,\n"
-    "    \"iterations\": 100\n"
+    "    \"checksum\": 3748675368,\n"
+    "    \"coords\": 7150,\n"
+    "    \"iterations\": 140\n"
     "  },\n"
     "  {\n"
     "    \"name\": \"Json::ParseMapping\",\n"
-    "    \"checksum\": 4157826592,\n"
-    "    \"coords\": 11000,\n"
-    "    \"iterations\": 100\n"
+    "    \"checksum\": 3881115832,\n"
+    "    \"coords\": 7250,\n"
+    "    \"iterations\": 135\n"
     "  },\n"
     "  {\n"
     "    \"name\": \"CSV::Parse\",\n"
-    "    \"checksum\": 2039510507,\n"
-    "    \"rows\": 43000,\n"
-    "    \"iterations\": 70\n"
+    "    \"checksum\": 4100523384,\n"
+    "    \"rows\": 42000,\n"
+    "    \"iterations\": 69\n"
     "  },\n"
     "  {\n"
     "    \"name\": \"Etc::Sieve\",\n"
-    "    \"checksum\": 1305051852,\n"
-    "    \"limit\": 3500000,\n"
-    "    \"iterations\": 290\n"
+    "    \"checksum\": 1245407760,\n"
+    "    \"limit\": 3800000,\n"
+    "    \"iterations\": 255\n"
     "  },\n"
     "  {\n"
     "    \"name\": \"Etc::TextRaytracer\",\n"
-    "    \"checksum\": 2070855360,\n"
-    "    \"w\": 800,\n"
-    "    \"h\": 800,\n"
-    "    \"iterations\": 75\n"
+    "    \"checksum\": 2468257330,\n"
+    "    \"w\": 790,\n"
+    "    \"h\": 790,\n"
+    "    \"iterations\": 92\n"
     "  },\n"
     "  {\n"
     "    \"name\": \"Etc::NeuralNet\",\n"
-    "    \"checksum\": 144809111,\n"
-    "    \"iterations\": 1650\n"
+    "    \"checksum\": 144809110,\n"
+    "    \"iterations\": 1600\n"
     "  },\n"
     "  {\n"
     "    \"name\": \"Etc::CacheSimulation\",\n"
-    "    \"checksum\": 3382401640,\n"
+    "    \"checksum\": 3702834824,\n"
     "    \"values\": 5500,\n"
     "    \"size\": 2600,\n"
-    "    \"iterations\": 5500\n"
+    "    \"iterations\": 6050\n"
     "  },\n"
     "  {\n"
     "    \"name\": \"Etc::GameOfLife\",\n"
-    "    \"checksum\": 3596232155,\n"
+    "    \"checksum\": 2513640171,\n"
     "    \"w\": 440,\n"
     "    \"h\": 440,\n"
-    "    \"iterations\": 440\n"
+    "    \"iterations\": 415\n"
     "  },\n"
     "  {\n"
     "    \"name\": \"Etc::Words\",\n"
-    "    \"checksum\": 712245858,\n"
+    "    \"checksum\": 3846060856,\n"
     "    \"words\": 50000,\n"
     "    \"word_len\": 4,\n"
-    "    \"iterations\": 225\n"
+    "    \"iterations\": 220\n"
     "  },\n"
     "  {\n"
     "    \"name\": \"Etc::LogParser\",\n"
-    "    \"checksum\": 67092,\n"
-    "    \"iterations\": 10,\n"
-    "    \"lines_count\": 1200\n"
+    "    \"checksum\": 40256,\n"
+    "    \"iterations\": 14,\n"
+    "    \"lines_count\": 540\n"
     "  },\n"
     "  {\n"
     "    \"name\": \"Template::Regex\",\n"
-    "    \"checksum\": 3403329035,\n"
-    "    \"iterations\": 20,\n"
+    "    \"checksum\": 3411727785,\n"
+    "    \"iterations\": 22,\n"
     "    \"count\": 50000\n"
     "  },\n"
     "  {\n"
@@ -16176,21 +16190,21 @@ int main(int argc, char *argv[]) {
     "  },\n"
     "  {\n"
     "    \"name\": \"Sort::Quick\",\n"
-    "    \"checksum\": 58455215,\n"
+    "    \"checksum\": 55512467,\n"
     "    \"size\": 370000,\n"
-    "    \"iterations\": 50\n"
+    "    \"iterations\": 48\n"
     "  },\n"
     "  {\n"
     "    \"name\": \"Sort::Merge\",\n"
-    "    \"checksum\": 61652378,\n"
+    "    \"checksum\": 44892463,\n"
     "    \"size\": 395000,\n"
-    "    \"iterations\": 50\n"
+    "    \"iterations\": 38\n"
     "  },\n"
     "  {\n"
     "    \"name\": \"Sort::Self\",\n"
-    "    \"checksum\": 63111306,\n"
+    "    \"checksum\": 56460613,\n"
     "    \"size\": 240000,\n"
-    "    \"iterations\": 53\n"
+    "    \"iterations\": 48\n"
     "  },\n"
     "  {\n"
     "    \"name\": \"Graph::BFS\",\n"
@@ -16202,43 +16216,43 @@ int main(int argc, char *argv[]) {
     "  },\n"
     "  {\n"
     "    \"name\": \"Graph::DFS\",\n"
-    "    \"checksum\": 24660,\n"
-    "    \"vertices\": 500000,\n"
+    "    \"checksum\": 22705,\n"
+    "    \"vertices\": 500500,\n"
     "    \"jumps\": 20,\n"
     "    \"jump_len\": 1000,\n"
-    "    \"iterations\": 17\n"
+    "    \"iterations\": 16\n"
     "  },\n"
     "  {\n"
     "    \"name\": \"Graph::AStar\",\n"
-    "    \"checksum\": 3001890,\n"
-    "    \"vertices\": 1200000,\n"
+    "    \"checksum\": 3003120,\n"
+    "    \"vertices\": 1200500,\n"
     "    \"jumps\": 20,\n"
     "    \"jump_len\": 27,\n"
     "    \"iterations\": 25\n"
     "  },\n"
     "  {\n"
     "    \"name\": \"Hash::SHA256\",\n"
-    "    \"checksum\": 2682354976,\n"
+    "    \"checksum\": 346753887,\n"
     "    \"size\": 1100000,\n"
     "    \"iterations\": 1200\n"
     "  },\n"
     "  {\n"
     "    \"name\": \"Hash::CRC32\",\n"
-    "    \"checksum\": 610363760,\n"
+    "    \"checksum\": 2412799940,\n"
     "    \"size\": 1200000,\n"
-    "    \"iterations\": 150\n"
+    "    \"iterations\": 98\n"
     "  },\n"
     "  {\n"
     "    \"name\": \"Calculator::Ast\",\n"
-    "    \"checksum\": 3196123703,\n"
+    "    \"checksum\": 1494870212,\n"
     "    \"operations\": 45500,\n"
-    "    \"iterations\": 26\n"
+    "    \"iterations\": 30\n"
     "  },\n"
     "  {\n"
     "    \"name\": \"Calculator::Interpreter\",\n"
-    "    \"checksum\": 3726790644,\n"
+    "    \"checksum\": 1616756268,\n"
     "    \"operations\": 70000,\n"
-    "    \"iterations\": 45\n"
+    "    \"iterations\": 49\n"
     "  },\n"
     "  {\n"
     "    \"name\": \"Maze::Generator\",\n"
@@ -16249,23 +16263,23 @@ int main(int argc, char *argv[]) {
     "  },\n"
     "  {\n"
     "    \"name\": \"Maze::BFS\",\n"
-    "    \"checksum\": 6218187,\n"
+    "    \"checksum\": 6402153,\n"
     "    \"w\": 1400,\n"
     "    \"h\": 1400,\n"
-    "    \"iterations\": 160\n"
+    "    \"iterations\": 165\n"
     "  },\n"
     "  {\n"
     "    \"name\": \"Maze::AStar\",\n"
-    "    \"checksum\": 3734646,\n"
+    "    \"checksum\": 3918612,\n"
     "    \"w\": 1400,\n"
     "    \"h\": 1400,\n"
-    "    \"iterations\": 93\n"
+    "    \"iterations\": 98\n"
     "  },\n"
     "  {\n"
     "    \"name\": \"CLBG::Fannkuchredux\",\n"
-    "    \"checksum\": 124125696,\n"
+    "    \"checksum\": 127519758,\n"
     "    \"n\": 8,\n"
-    "    \"iterations\": 640\n"
+    "    \"iterations\": 658\n"
     "  },\n"
     "  {\n"
     "    \"name\": \"CLBG::Mandelbrot\",\n"
@@ -16287,33 +16301,33 @@ int main(int argc, char *argv[]) {
     "  },\n"
     "  {\n"
     "    \"name\": \"Compress::BWTEncode\",\n"
-    "    \"checksum\": 5100000,\n"
+    "    \"checksum\": 5400000,\n"
     "    \"size\": 100000,\n"
-    "    \"iterations\": 43\n"
+    "    \"iterations\": 45\n"
     "  },\n"
     "  {\n"
     "    \"name\": \"Compress::BWTDecode\",\n"
-    "    \"checksum\": 252100252,\n"
+    "    \"checksum\": 258100258,\n"
     "    \"size\": 1000001,\n"
-    "    \"iterations\": 210\n"
+    "    \"iterations\": 215\n"
     "  },\n"
     "  {\n"
     "    \"name\": \"Compress::HuffEncode\",\n"
-    "    \"checksum\": 84682260,\n"
+    "    \"checksum\": 90955020,\n"
     "    \"size\": 1000002,\n"
-    "    \"iterations\": 270\n"
+    "    \"iterations\": 290\n"
     "  },\n"
     "  {\n"
     "    \"name\": \"Compress::HuffDecode\",\n"
-    "    \"checksum\": 984102952,\n"
+    "    \"checksum\": 480101440,\n"
     "    \"size\": 1000003,\n"
-    "    \"iterations\": 820\n"
+    "    \"iterations\": 400\n"
     "  },\n"
     "  {\n"
     "    \"name\": \"Compress::ArithEncode\",\n"
-    "    \"checksum\": 14079312,\n"
+    "    \"checksum\": 12855024,\n"
     "    \"size\": 100004,\n"
-    "    \"iterations\": 460\n"
+    "    \"iterations\": 420\n"
     "  },\n"
     "  {\n"
     "    \"name\": \"Compress::ArithDecode\",\n"
@@ -16323,34 +16337,356 @@ int main(int argc, char *argv[]) {
     "  },\n"
     "  {\n"
     "    \"name\": \"Compress::LZWEncode\",\n"
-    "    \"checksum\": 300528,\n"
+    "    \"checksum\": 350616,\n"
     "    \"size\": 200006,\n"
-    "    \"iterations\": 60\n"
+    "    \"iterations\": 70\n"
     "  },\n"
     "  {\n"
     "    \"name\": \"Compress::LZWDecode\",\n"
-    "    \"checksum\": 3888100000,\n"
-    "    \"size\": 12000000,\n"
-    "    \"iterations\": 270\n"
+    "    \"checksum\": 3960100000,\n"
+    "    \"size\": 1200000,\n"
+    "    \"iterations\": 2750\n"
     "  },\n"
     "  {\n"
     "    \"name\": \"Distance::Jaro\",\n"
-    "    \"checksum\": 625538544,\n"
-    "    \"iterations\": 860,\n"
+    "    \"checksum\": 652807080,\n"
+    "    \"iterations\": 900,\n"
     "    \"count\": 1000,\n"
-    "    \"size\": 50\n"
+    "    \"size\": 49\n"
     "  },\n"
     "  {\n"
     "    \"name\": \"Distance::NGram\",\n"
-    "    \"checksum\": 267408,\n"
-    "    \"iterations\": 90,\n"
+    "    \"checksum\": 272360,\n"
+    "    \"iterations\": 92,\n"
     "    \"count\": 10,\n"
     "    \"size\": 15000\n"
     "  }\n"
     "]\n"
   ;
 
-  Helper_load_config(config);
+  static const char test_config[] =
+    "[\n"
+    "  {\n"
+    "    \"name\": \"Binarytrees::Obj\",\n"
+    "    \"checksum\": 124,\n"
+    "    \"depth\": 4,\n"
+    "    \"iterations\": 3\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Binarytrees::Arena\",\n"
+    "    \"checksum\": 124,\n"
+    "    \"depth\": 4,\n"
+    "    \"iterations\": 3\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Brainfuck::Array\",\n"
+    "    \"checksum\": 3562897308,\n"
+    "    \"program\": \"++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>.\",\n"
+    "    \"warmup_program\": \"++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>.\",\n"
+    "    \"warmup_iterations\": 1,\n"
+    "    \"iterations\": 2\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Brainfuck::Recursion\",\n"
+    "    \"checksum\": 3562897308,\n"
+    "    \"program\": \"++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>.\",\n"
+    "    \"warmup_program\": \"++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>.\",\n"
+    "    \"warmup_iterations\": 1,\n"
+    "    \"iterations\": 2\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Matmul::Single\",\n"
+    "    \"checksum\": 720656960,\n"
+    "    \"n\": 40,\n"
+    "    \"iterations\": 3\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Matmul::T4\",\n"
+    "    \"checksum\": 2420334760,\n"
+    "    \"n\": 42,\n"
+    "    \"iterations\": 3\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Matmul::T8\",\n"
+    "    \"checksum\": 4014223764,\n"
+    "    \"n\": 44,\n"
+    "    \"iterations\": 3\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Matmul::T16\",\n"
+    "    \"checksum\": 418055336,\n"
+    "    \"n\": 46,\n"
+    "    \"iterations\": 3\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Base64::Encode\",\n"
+    "    \"checksum\": 3894061047,\n"
+    "    \"size\": 30,\n"
+    "    \"iterations\": 8192\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Base64::Decode\",\n"
+    "    \"checksum\": 732348015,\n"
+    "    \"size\": 23,\n"
+    "    \"iterations\": 8192\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Json::Generate\",\n"
+    "    \"checksum\": 4,\n"
+    "    \"coords\": 9,\n"
+    "    \"iterations\": 3\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Json::ParseDom\",\n"
+    "    \"checksum\": 2918383076,\n"
+    "    \"coords\": 10,\n"
+    "    \"iterations\": 3\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Json::ParseMapping\",\n"
+    "    \"checksum\": 1969907348,\n"
+    "    \"coords\": 11,\n"
+    "    \"iterations\": 3\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"CSV::Parse\",\n"
+    "    \"checksum\": 3563398641,\n"
+    "    \"rows\": 11,\n"
+    "    \"iterations\": 3\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Etc::Sieve\",\n"
+    "    \"checksum\": 4660,\n"
+    "    \"limit\": 1000,\n"
+    "    \"iterations\": 3\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Etc::TextRaytracer\",\n"
+    "    \"checksum\": 1438660,\n"
+    "    \"w\": 100,\n"
+    "    \"h\": 100,\n"
+    "    \"iterations\": 3\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Etc::NeuralNet\",\n"
+    "    \"checksum\": 1586674334,\n"
+    "    \"iterations\": 2\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Etc::CacheSimulation\",\n"
+    "    \"checksum\": 179773224,\n"
+    "    \"values\": 2000,\n"
+    "    \"size\": 1000,\n"
+    "    \"iterations\": 2\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Etc::GameOfLife\",\n"
+    "    \"checksum\": 4006235749,\n"
+    "    \"w\": 20,\n"
+    "    \"h\": 20,\n"
+    "    \"iterations\": 3\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Etc::Words\",\n"
+    "    \"checksum\": 580539813,\n"
+    "    \"words\": 600,\n"
+    "    \"word_len\": 1,\n"
+    "    \"iterations\": 2\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Etc::LogParser\",\n"
+    "    \"checksum\": 138,\n"
+    "    \"iterations\": 2,\n"
+    "    \"lines_count\": 10\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Template::Regex\",\n"
+    "    \"checksum\": 1554169905,\n"
+    "    \"iterations\": 2,\n"
+    "    \"count\": 12\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Template::Parse\",\n"
+    "    \"checksum\": 917360148,\n"
+    "    \"iterations\": 2,\n"
+    "    \"count\": 10\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Sort::Quick\",\n"
+    "    \"checksum\": 2548773,\n"
+    "    \"size\": 100000,\n"
+    "    \"iterations\": 2\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Sort::Merge\",\n"
+    "    \"checksum\": 2548773,\n"
+    "    \"size\": 100000,\n"
+    "    \"iterations\": 2\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Sort::Self\",\n"
+    "    \"checksum\": 2548773,\n"
+    "    \"size\": 100000,\n"
+    "    \"iterations\": 2\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Graph::BFS\",\n"
+    "    \"checksum\": 20,\n"
+    "    \"vertices\": 100,\n"
+    "    \"jumps\": 3,\n"
+    "    \"jump_len\": 100,\n"
+    "    \"iterations\": 3\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Graph::DFS\",\n"
+    "    \"checksum\": 28,\n"
+    "    \"vertices\": 100,\n"
+    "    \"jumps\": 3,\n"
+    "    \"jump_len\": 100,\n"
+    "    \"iterations\": 3\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Graph::AStar\",\n"
+    "    \"checksum\": 36,\n"
+    "    \"vertices\": 100,\n"
+    "    \"jumps\": 3,\n"
+    "    \"jump_len\": 100,\n"
+    "    \"iterations\": 3\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Hash::SHA256\",\n"
+    "    \"checksum\": 1036619072,\n"
+    "    \"size\": 1000,\n"
+    "    \"iterations\": 3\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Hash::CRC32\",\n"
+    "    \"checksum\": 1626481306,\n"
+    "    \"size\": 1000,\n"
+    "    \"iterations\": 3\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Calculator::Ast\",\n"
+    "    \"checksum\": 774028720,\n"
+    "    \"operations\": 3,\n"
+    "    \"iterations\": 3\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Calculator::Interpreter\",\n"
+    "    \"checksum\": 3208680,\n"
+    "    \"operations\": 10,\n"
+    "    \"iterations\": 100\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Maze::Generator\",\n"
+    "    \"checksum\": 2309652669,\n"
+    "    \"w\": 200,\n"
+    "    \"h\": 30,\n"
+    "    \"iterations\": 2\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Maze::BFS\",\n"
+    "    \"checksum\": 6771,\n"
+    "    \"w\": 200,\n"
+    "    \"h\": 30,\n"
+    "    \"iterations\": 2\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Maze::AStar\",\n"
+    "    \"checksum\": 6771,\n"
+    "    \"w\": 200,\n"
+    "    \"h\": 30,\n"
+    "    \"iterations\": 2\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"CLBG::Fannkuchredux\",\n"
+    "    \"checksum\": 4428,\n"
+    "    \"n\": 5,\n"
+    "    \"iterations\": 3\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"CLBG::Mandelbrot\",\n"
+    "    \"checksum\": 2236342953,\n"
+    "    \"w\": 30,\n"
+    "    \"h\": 30,\n"
+    "    \"iterations\": 3\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"CLBG::Nbody\",\n"
+    "    \"checksum\": 338796608,\n"
+    "    \"iterations\": 2\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"CLBG::Spectralnorm\",\n"
+    "    \"checksum\": 1052168784,\n"
+    "    \"size\": 45,\n"
+    "    \"iterations\": 10\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Compress::BWTEncode\",\n"
+    "    \"checksum\": 200,\n"
+    "    \"size\": 50,\n"
+    "    \"iterations\": 3\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Compress::BWTDecode\",\n"
+    "    \"checksum\": 100204,\n"
+    "    \"size\": 51,\n"
+    "    \"iterations\": 3\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Compress::HuffEncode\",\n"
+    "    \"checksum\": 56,\n"
+    "    \"size\": 52,\n"
+    "    \"iterations\": 3\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Compress::HuffDecode\",\n"
+    "    \"checksum\": 100212,\n"
+    "    \"size\": 53,\n"
+    "    \"iterations\": 3\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Compress::ArithEncode\",\n"
+    "    \"checksum\": 56,\n"
+    "    \"size\": 54,\n"
+    "    \"iterations\": 3\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Compress::ArithDecode\",\n"
+    "    \"checksum\": 100220,\n"
+    "    \"size\": 55,\n"
+    "    \"iterations\": 3\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Compress::LZWEncode\",\n"
+    "    \"checksum\": 208,\n"
+    "    \"size\": 60,\n"
+    "    \"iterations\": 3\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Compress::LZWDecode\",\n"
+    "    \"checksum\": 100244,\n"
+    "    \"size\": 61,\n"
+    "    \"iterations\": 3\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Distance::Jaro\",\n"
+    "    \"checksum\": 7020,\n"
+    "    \"iterations\": 1,\n"
+    "    \"count\": 10,\n"
+    "    \"size\": 5\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Distance::NGram\",\n"
+    "    \"checksum\": 42,\n"
+    "    \"iterations\": 1,\n"
+    "    \"count\": 2,\n"
+    "    \"size\": 500\n"
+    "  }\n"
+    "]\n";
+
+  Helper_load_config(test ? test_config : config);
   register_all_benchmarks();
 
   const char *single_bench = argc > 1 ? argv[1] : NULL;
@@ -16363,12 +16699,6 @@ int main(int argc, char *argv[]) {
     benchmark_factories = NULL;
     benchmark_factories_count = 0;
     benchmark_factories_capacity = 0;
-  }
-
-  FILE *f = fopen("/tmp/recompile_marker", "w");
-  if (f) {
-    fprintf(f, "RECOMPILE_MARKER_0");
-    fclose(f);
   }
 
   return 0;

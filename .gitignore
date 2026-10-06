@@ -1,2 +1,4 @@
 index
 *.o
+/experiment/py
+.DS_Store
