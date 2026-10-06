@@ -16,7 +16,7 @@
 
 // Build:
 
-//     gcc index.c -O3 -lm -o ./index
+//     gcc index.c -O3 -lm -lpthread -o ./index
 //     ./index
 
 // It includes the following third-party libraries:
