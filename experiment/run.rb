@@ -41,7 +41,7 @@ COMPILERS = {
   'teeks99/clang-ubuntu' => ['2026-08-25'],
 }
 
-OPT_FLAGS = %w[-O0 -O1 -O2 -O3].freeze
+OPT_FLAGS = ["-O0", "-O1", "-O2", "-O3", "-Os", "-Oz", "-Ofast", "-O3 -march=native"]
 SRC       = 'index.c'
 
 def clean_version(raw)
@@ -70,14 +70,21 @@ def run_one(image, flags)
     #{cc} --version | head -1
     echo versionend
     echo compilestart
-    { time #{cc} -Wno-format -std=gnu11 #{flags} #{SRC} -lm -lpthread -o /tmp/index ; } 2>&1
+    { time #{cc} -std=gnu11 #{flags} #{SRC} -lm -lpthread -o /tmp/index ; } 2>&1
     echo compileend
+    echo rawsize_start
+    stat -c %s /tmp/index
+    echo rawsize_end
     /tmp/index
+    strip /tmp/index 2>/dev/null || true
+    echo stripsize_start
+    stat -c %s /tmp/index
+    echo stripsize_end
   SH
 
   stdout, stderr, status = Open3.capture3(
     'docker', 'run', '--rm',
-    '-v', "#{Dir.pwd}:/app", '-w', '/app',
+    '-v', "#{Dir.pwd}/..:/app", '-w', '/app',
     image, 'bash', '-c', cmd
   )
 
@@ -96,6 +103,9 @@ def run_one(image, flags)
   compile_sec = block[/real\s+(\d+)m([\d.]+)s/, 1].to_f * 60 +
                 block[/real\s+(\d+)m([\d.]+)s/, 2].to_f
 
+  raw_size   = stdout[/rawsize_start\n(\d+)\nrawsize_end/m, 1]&.to_i
+  strip_size = stdout[/stripsize_start\n(\d+)\nstripsize_end/m, 1]&.to_i
+
   summary_line = stdout.lines.grep(/^Summary:/).last
   return nil unless summary_line
 
@@ -111,29 +121,42 @@ def run_one(image, flags)
     version: clean_version(version),
     compile_time: compile_sec,
     bench_time: m[1].to_f,
+    binary_size: raw_size,
+    binary_size_stripped: strip_size,
   }
 end
 
 array = []
 
+envs = []
 COMPILERS.each do |image, (date)|
   OPT_FLAGS.each do |flags|
-    print "#{image}: #{flags} ... "
-    res = run_one(image, flags)
-    unless res
-      puts "[ERROR]"
-      next
-    else
-      puts "[OK] (version=#{res[:version]}, compile=#{res[:compile_time].round(2)}s, runtime=#{res[:bench_time].round(2)}s)"
-    end
-
-    res[:image] = image
-    res[:release_date] = date
-    res[:flags] = flags
-
-    array << res
-    File.open("./history.js", "w") { |f| f.puts(array.to_json) }
+    envs << [image, date, flags]
   end
+end
+
+if ARGV[0] == "1"
+  envs.shuffle!
+end
+
+envs.each_with_index do |(image, date, flags), index|
+  print "[#{index + 1} from #{envs.size}] #{image}: #{flags} ... "
+  res = run_one(image, flags)
+  unless res
+    puts "[ERROR]"
+    next
+  else
+    puts "[OK] (version=#{res[:version]}, compile=#{res[:compile_time].round(2)}s, " \
+         "runtime=#{res[:bench_time].round(2)}s, " \
+         "size=#{res[:binary_size]} -> #{res[:binary_size_stripped]} bytes)"
+  end
+
+  res[:image] = image
+  res[:release_date] = date
+  res[:flags] = flags
+
+  array << res
+  File.open("./history.js", "w") { |f| f.puts(array.to_json) }
 end
 
 File.open("./history.js", "w") { |f| f.puts(array.to_json) }
