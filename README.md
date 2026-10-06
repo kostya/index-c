@@ -41,15 +41,15 @@ on my machine. That is, the total time is approximately 53 seconds (but results 
 
 # Experiment: GCC and Clang performance over 10 years. Version 2.
 
-I measured runtime, compilation time, and binary size for `index.c` across GCC 4.9–16.2 and Clang 3.9–23.1.3, using the flags `-O0`, `-O1`, `-O2`, `-O3`, `-Os`, `-Oz`, `-Ofast`, and `-O3 -march=native`.
+I measured runtime, compilation time, and binary size for `index.c` across GCC 4–16 and Clang 3–23, using the flags `-O0`, `-O1`, `-O2`, `-O3`, `-Os`, `-Oz`, `-Ofast`, and `-O3 -march=native`.
 
 Rerun on 2026-10-06. The first post was deleted because I was doing several measurements and the results were jumping around, so I started doubting them and deleted the post. Now I've done several runs and averaged the results (shown as spread bands on the graphs). I also tuned the configuration for `index.c` so it wouldn't be too favored toward Clang. In the previous run, Clang was much faster on the `Base64::Encode` test - its baseline was 1s on Clang but 8s on GCC, which hurt GCC a lot. Now this test is calibrated against GCC 1s, and the summary time no longer has a big gap against Clang because of a single test.
 
 Keep in mind that these results are specific to my machine:
 
 - **CPU:** Ryzen 3800X
-- **RAM:** 64 GB DDR4-3200
-- **OS:** Ubuntu 26.04
+- **RAM:** 78 GB DDR4-3200
+- **OS:** Linux arch 7.2.7
 - **Docker:** 29.8.1
 
 They will likely differ under other conditions, so I wouldn't recommend treating them as verified or official, or citing them in any source. This is just my experiment; whether to trust it is up to you. You can run the script below to reproduce it - it requires only Linux, Docker, and Ruby.
@@ -101,6 +101,8 @@ This is also confirmed by this source: https://github.com/lac-dcc/BenchGen/wiki/
 ![plot](experiment/plot5_runtime.png)
 
 ![plot](experiment/plot5_compile.png)
+
+The tested processor came out in 2019, but the effect of `-march=native` only started to matter in 2022.
 
 * [reproduce script](https://github.com/kostya/index-c/blob/master/experiment/run.rb)
 * [raw data](https://github.com/kostya/index-c/blob/master/experiment/merged.js)
