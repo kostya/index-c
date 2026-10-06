@@ -16,7 +16,7 @@
 
 // Build:
 
-//     gcc -Wno-format index.c -O3 -lm -o ./index
+//     gcc index.c -O3 -lm -o ./index
 //     ./index
 
 // It includes the following third-party libraries:
