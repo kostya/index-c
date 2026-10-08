@@ -66,7 +66,7 @@ The benchmarks are run using Docker, with images pulled from Docker Hub. This ca
 
 ![plot](experiment/plot1_compile.png)
 
-Regarding the slowdown in GCC compile time (in O2,O3 mode), it is clearly reproducible with two simple commands (using the official GCC images):
+Regarding the slowdown in GCC compile time (in `-O2`/`-O3` mode), it is clearly reproducible with two simple commands (using the official GCC images):
 
 ```
 docker run --rm -v `pwd`:/src -w /src gcc:7 bash -c 'time gcc /src/index.c -O3 -lm -lpthread -o /tmp/index'
@@ -80,23 +80,25 @@ real  0m4.948s
 
 This is also confirmed by this source: https://github.com/lac-dcc/BenchGen/wiki/Comparing-gcc-versions#1 `Comparing version 5 and version 14, there is an increase of about 42% over a span of 9 years.`
 
-### Results for O0.
+It's also worth noting that `index.c` is a large (500 KB) amalgamated file. GCC may struggle with this kind of use case, which is actually not typical. This was not tested on smaller files - that is material for another experiment.
+
+### Results for `-O0`
 
 ![plot](experiment/plot2_runtime.png)
 
 ![plot](experiment/plot2_compile.png)
 
-### Results for binary size.
+### Results for binary size
 
 ![plot](experiment/plot3_binary_size.png)
 
-### Results for Os, Oz vs O2.
+### Results for `-Os`, `-Oz` vs `-O2`
 
 ![plot](experiment/plot4_runtime.png)
 
 ![plot](experiment/plot4_compile.png)
 
-### Results for "-Ofast", "-O3 -march=native" vs O3.
+### Results for `-Ofast`, `-O3 -march=native` vs `-O3`
 
 ![plot](experiment/plot5_runtime.png)
 
