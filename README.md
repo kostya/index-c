@@ -82,6 +82,10 @@ This is also confirmed by this source: https://github.com/lac-dcc/BenchGen/wiki/
 
 It's also worth noting that `index.c` is a large (500 KB) amalgamated file. GCC may struggle with this kind of use case, which is actually not typical. This was not tested on smaller files - that is material for another experiment.
 
+### Results for `-O2` runtime vs compile time
+
+![plot](experiment/plot6.png)
+
 ### Results for `-O0`
 
 ![plot](experiment/plot2_runtime.png)
