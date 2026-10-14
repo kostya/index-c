@@ -1,25 +1,36 @@
 // # C Stress Test (https://github.com/kostya/index-c)
 
-// A single-file, self-contained stress test for C compilers and optimizers.
+// An amalgamated, simplified version of the [LangArena](https://github.com/kostya/LangArena)
+// suite for the C language.
 
-// This is an amalgamated/simplified version of the LangArena benchmark
-// (https://github.com/kostya/LangArena) for the C language.
-
-// LangArena: A collection of 50 tasks across 24 languages - complex,
-// non-synthetic, and inspired by real-world problems (JSON, Base64, CSV,
+// LangArena is a collection of 50 real-world-inspired tasks: JSON, Base64, CSV,
 // neural networks, compression, maze A*, graph algorithms, sorting, hashing,
-// interpreters, parallel matmul, and more).
+// interpreters, parallel matmul, and more.
 
-// Fully "all in" - it has no external dependencies beyond the standard
-// libraries. That is, this file is completely self-contained and can be used
-// as a stress test for C compilers on its own, as well as for the optimizer.
+// The file (index.c) serves three purposes at once:
 
-// Build:
+// - **Compiler stress test** - a single ~500 KB translation unit exercises the
+//   front end, optimizer, and back end.
+// - **Runtime benchmark** - each test runs for roughly a second, so the total
+//   runtime is around 53 seconds on my hardware.
+// - **Correctness verifier** - every test checks its result against a checksum.
+//   If any test fails, the program exits with code 1.
+
+// Fully "all in": no external dependencies beyond the standard libraries.
+
+// All parameters have been tuned for GCC 15 -O2. Timings may differ on other
+// hardware.
+
+// ### Build and run:
 
 //     gcc index.c -O3 -lm -lpthread -o ./index
 //     ./index
 
-// It includes the following third-party libraries:
+// ### Fast run, only test checksums
+
+//     TEST=1 ./index
+
+// ### Source includes:
 
 // * https://github.com/DaveGamble/cJSON
 //   MIT License (Copyright (c) 2009-2017 Dave Gamble and cJSON contributors)
@@ -33,12 +44,6 @@
 
 // * https://github.com/wareya/Remimu/
 //   Creative Commons Legal Code
-
-// It also includes the config directly in this file.
-
-// All parameters have been tuned so that each test runs for roughly 1 second
-// on my machine. That is, the total time is approximately 50 seconds (but
-// results may differ on other hardware).
 
 // Copyright (c) 2026 'Konstantin Makarchev'
 
@@ -16022,6 +16027,9 @@ void register_all_benchmarks(void) {
 }
 
 int main(int argc, char *argv[]) {
+  int test = 0;
+  const char *test_str = getenv("TEST");
+  if (test_str != NULL && strcmp(test_str, "1") == 0) test = 1;
   struct timespec start_time;
   clock_gettime(CLOCK_REALTIME, &start_time);
   printf("start: %ld\n",
@@ -16350,7 +16358,329 @@ int main(int argc, char *argv[]) {
     "]\n"
   ;
 
-  Helper_load_config(config);
+  static const char test_config[] =
+    "[\n"
+    "  {\n"
+    "    \"name\": \"Binarytrees::Obj\",\n"
+    "    \"checksum\": 124,\n"
+    "    \"depth\": 4,\n"
+    "    \"iterations\": 3\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Binarytrees::Arena\",\n"
+    "    \"checksum\": 124,\n"
+    "    \"depth\": 4,\n"
+    "    \"iterations\": 3\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Brainfuck::Array\",\n"
+    "    \"checksum\": 3562897308,\n"
+    "    \"program\": \"++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>.\",\n"
+    "    \"warmup_program\": \"++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>.\",\n"
+    "    \"warmup_iterations\": 1,\n"
+    "    \"iterations\": 2\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Brainfuck::Recursion\",\n"
+    "    \"checksum\": 3562897308,\n"
+    "    \"program\": \"++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>.\",\n"
+    "    \"warmup_program\": \"++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>.\",\n"
+    "    \"warmup_iterations\": 1,\n"
+    "    \"iterations\": 2\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Matmul::Single\",\n"
+    "    \"checksum\": 720656960,\n"
+    "    \"n\": 40,\n"
+    "    \"iterations\": 3\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Matmul::T4\",\n"
+    "    \"checksum\": 2420334760,\n"
+    "    \"n\": 42,\n"
+    "    \"iterations\": 3\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Matmul::T8\",\n"
+    "    \"checksum\": 4014223764,\n"
+    "    \"n\": 44,\n"
+    "    \"iterations\": 3\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Matmul::T16\",\n"
+    "    \"checksum\": 418055336,\n"
+    "    \"n\": 46,\n"
+    "    \"iterations\": 3\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Base64::Encode\",\n"
+    "    \"checksum\": 3894061047,\n"
+    "    \"size\": 30,\n"
+    "    \"iterations\": 8192\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Base64::Decode\",\n"
+    "    \"checksum\": 732348015,\n"
+    "    \"size\": 23,\n"
+    "    \"iterations\": 8192\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Json::Generate\",\n"
+    "    \"checksum\": 4,\n"
+    "    \"coords\": 9,\n"
+    "    \"iterations\": 3\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Json::ParseDom\",\n"
+    "    \"checksum\": 2918383076,\n"
+    "    \"coords\": 10,\n"
+    "    \"iterations\": 3\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Json::ParseMapping\",\n"
+    "    \"checksum\": 1969907348,\n"
+    "    \"coords\": 11,\n"
+    "    \"iterations\": 3\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"CSV::Parse\",\n"
+    "    \"checksum\": 3563398641,\n"
+    "    \"rows\": 11,\n"
+    "    \"iterations\": 3\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Etc::Sieve\",\n"
+    "    \"checksum\": 4660,\n"
+    "    \"limit\": 1000,\n"
+    "    \"iterations\": 3\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Etc::TextRaytracer\",\n"
+    "    \"checksum\": 1438660,\n"
+    "    \"w\": 100,\n"
+    "    \"h\": 100,\n"
+    "    \"iterations\": 3\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Etc::NeuralNet\",\n"
+    "    \"checksum\": 1586674334,\n"
+    "    \"iterations\": 2\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Etc::CacheSimulation\",\n"
+    "    \"checksum\": 179773224,\n"
+    "    \"values\": 2000,\n"
+    "    \"size\": 1000,\n"
+    "    \"iterations\": 2\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Etc::GameOfLife\",\n"
+    "    \"checksum\": 4006235749,\n"
+    "    \"w\": 20,\n"
+    "    \"h\": 20,\n"
+    "    \"iterations\": 3\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Etc::Words\",\n"
+    "    \"checksum\": 580539813,\n"
+    "    \"words\": 600,\n"
+    "    \"word_len\": 1,\n"
+    "    \"iterations\": 2\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Etc::LogParser\",\n"
+    "    \"checksum\": 138,\n"
+    "    \"iterations\": 2,\n"
+    "    \"lines_count\": 10\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Template::Regex\",\n"
+    "    \"checksum\": 1554169905,\n"
+    "    \"iterations\": 2,\n"
+    "    \"count\": 12\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Template::Parse\",\n"
+    "    \"checksum\": 917360148,\n"
+    "    \"iterations\": 2,\n"
+    "    \"count\": 10\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Sort::Quick\",\n"
+    "    \"checksum\": 2548773,\n"
+    "    \"size\": 100000,\n"
+    "    \"iterations\": 2\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Sort::Merge\",\n"
+    "    \"checksum\": 2548773,\n"
+    "    \"size\": 100000,\n"
+    "    \"iterations\": 2\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Sort::Self\",\n"
+    "    \"checksum\": 2548773,\n"
+    "    \"size\": 100000,\n"
+    "    \"iterations\": 2\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Graph::BFS\",\n"
+    "    \"checksum\": 20,\n"
+    "    \"vertices\": 100,\n"
+    "    \"jumps\": 3,\n"
+    "    \"jump_len\": 100,\n"
+    "    \"iterations\": 3\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Graph::DFS\",\n"
+    "    \"checksum\": 28,\n"
+    "    \"vertices\": 100,\n"
+    "    \"jumps\": 3,\n"
+    "    \"jump_len\": 100,\n"
+    "    \"iterations\": 3\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Graph::AStar\",\n"
+    "    \"checksum\": 36,\n"
+    "    \"vertices\": 100,\n"
+    "    \"jumps\": 3,\n"
+    "    \"jump_len\": 100,\n"
+    "    \"iterations\": 3\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Hash::SHA256\",\n"
+    "    \"checksum\": 1036619072,\n"
+    "    \"size\": 1000,\n"
+    "    \"iterations\": 3\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Hash::CRC32\",\n"
+    "    \"checksum\": 3031698216,\n"
+    "    \"size\": 1000,\n"
+    "    \"iterations\": 3\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Calculator::Ast\",\n"
+    "    \"checksum\": 774028720,\n"
+    "    \"operations\": 3,\n"
+    "    \"iterations\": 3\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Calculator::Interpreter\",\n"
+    "    \"checksum\": 3208680,\n"
+    "    \"operations\": 10,\n"
+    "    \"iterations\": 100\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Maze::Generator\",\n"
+    "    \"checksum\": 2309652669,\n"
+    "    \"w\": 200,\n"
+    "    \"h\": 30,\n"
+    "    \"iterations\": 2\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Maze::BFS\",\n"
+    "    \"checksum\": 6771,\n"
+    "    \"w\": 200,\n"
+    "    \"h\": 30,\n"
+    "    \"iterations\": 2\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Maze::AStar\",\n"
+    "    \"checksum\": 6771,\n"
+    "    \"w\": 200,\n"
+    "    \"h\": 30,\n"
+    "    \"iterations\": 2\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"CLBG::Fannkuchredux\",\n"
+    "    \"checksum\": 4428,\n"
+    "    \"n\": 5,\n"
+    "    \"iterations\": 3\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"CLBG::Mandelbrot\",\n"
+    "    \"checksum\": 2236342953,\n"
+    "    \"w\": 30,\n"
+    "    \"h\": 30,\n"
+    "    \"iterations\": 3\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"CLBG::Nbody\",\n"
+    "    \"checksum\": 338796608,\n"
+    "    \"iterations\": 2\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"CLBG::Spectralnorm\",\n"
+    "    \"checksum\": 1052168784,\n"
+    "    \"size\": 45,\n"
+    "    \"iterations\": 10\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Compress::BWTEncode\",\n"
+    "    \"checksum\": 200,\n"
+    "    \"size\": 50,\n"
+    "    \"iterations\": 3\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Compress::BWTDecode\",\n"
+    "    \"checksum\": 100204,\n"
+    "    \"size\": 51,\n"
+    "    \"iterations\": 3\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Compress::HuffEncode\",\n"
+    "    \"checksum\": 56,\n"
+    "    \"size\": 52,\n"
+    "    \"iterations\": 3\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Compress::HuffDecode\",\n"
+    "    \"checksum\": 100212,\n"
+    "    \"size\": 53,\n"
+    "    \"iterations\": 3\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Compress::ArithEncode\",\n"
+    "    \"checksum\": 56,\n"
+    "    \"size\": 54,\n"
+    "    \"iterations\": 3\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Compress::ArithDecode\",\n"
+    "    \"checksum\": 100220,\n"
+    "    \"size\": 55,\n"
+    "    \"iterations\": 3\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Compress::LZWEncode\",\n"
+    "    \"checksum\": 208,\n"
+    "    \"size\": 60,\n"
+    "    \"iterations\": 3\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Compress::LZWDecode\",\n"
+    "    \"checksum\": 100244,\n"
+    "    \"size\": 61,\n"
+    "    \"iterations\": 3\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Distance::Jaro\",\n"
+    "    \"checksum\": 7020,\n"
+    "    \"iterations\": 1,\n"
+    "    \"count\": 10,\n"
+    "    \"size\": 5\n"
+    "  },\n"
+    "  {\n"
+    "    \"name\": \"Distance::NGram\",\n"
+    "    \"checksum\": 42,\n"
+    "    \"iterations\": 1,\n"
+    "    \"count\": 2,\n"
+    "    \"size\": 500\n"
+    "  }\n"
+    "]\n";
+
+  Helper_load_config(test ? test_config : config);
   register_all_benchmarks();
 
   const char *single_bench = argc > 1 ? argv[1] : NULL;

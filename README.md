@@ -1,26 +1,34 @@
 # C Stress Test
 
-This is an amalgamated/simplified version of the LangArena benchmark
-(https://github.com/kostya/LangArena) for the C language.
+An amalgamated, simplified version of the [LangArena](https://github.com/kostya/LangArena)
+suite for the C language.
 
-LangArena: A collection of 50 tasks across 26 languages - complex,
-non-synthetic, and inspired by real-world problems (JSON, Base64, CSV,
+LangArena is a collection of 50 real-world-inspired tasks: JSON, Base64, CSV,
 neural networks, compression, maze A*, graph algorithms, sorting, hashing,
-interpreters, parallel matmul, and more).
+interpreters, parallel matmul, and more.
 
-Fully "all in" - it has no external dependencies beyond the standard
-libraries. That is, this file is completely self-contained and can be used
-as a stress test for C compilers on its own, as well as for the optimizer.
+The file (index.c) serves three purposes at once:
 
-It also includes the config directly in this file.
+- **Compiler stress test** - a single ~500 KB translation unit exercises the
+  front end, optimizer, and back end.
+- **Runtime benchmark** - each test runs for roughly a second, so the total
+  runtime is around 53 seconds on my hardware.
+- **Correctness verifier** - every test checks its result against a checksum.
+  If any test fails, the program exits with code 1.
 
-All parameters have been tuned on GCC 15 -O2, so that each test runs for roughly > ~1 second
-on my machine. That is, the total time is approximately 53 seconds (but results may differ on other hardware).
+Fully "all in": no external dependencies beyond the standard libraries.
+
+All parameters have been tuned for GCC 15 -O2. Timings may differ on other
+hardware.
 
 ### Build and run:
 
     gcc index.c -O3 -lm -lpthread -o ./index
     ./index
+
+### Fast run, only test checksums
+
+    TEST=1 ./index
 
 ### Source includes:
 
