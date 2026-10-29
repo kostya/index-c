@@ -104,6 +104,8 @@ It's also worth noting that `index.c` is a large (500 KB) amalgamated file. GCC 
 
 ![plot](https://raw.githubusercontent.com/kostya/stuff/master/index-c/plot7_compile_mem.png)
 
+There is a large jump in memory usage for Clang between 2020-03-24 and 2020-10-12, and it coincided with a change in the source of the images from kunotoki to silkeh (kunitoki/clang-10 -> silkeh/clang:11), https://github.com/kostya/index-c/blob/master/experiment/run.rb#L29. It's possible this is related to the flags these images were built with rather than a degradation in Clang itself.
+
 ### Binary size, Kb
 
 ![plot](https://raw.githubusercontent.com/kostya/stuff/master/index-c/plot3_binary_size.png)
