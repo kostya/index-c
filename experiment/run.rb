@@ -18,27 +18,29 @@ COMPILERS = {
   'gcc:15'                 => ['2025-04-25'],
   'gcc:16'                 => ['2026-04-30'],
 
-  'kunitoki/clang-3'       => ['2016-09-01'],
-  'kunitoki/clang-4'       => ['2017-03-13'],
-  'kunitoki/clang-5'       => ['2017-09-07'],
-  'kunitoki/clang-6'       => ['2018-03-08'],
-  'kunitoki/clang-7'       => ['2018-09-19'],
-  'kunitoki/clang-8'       => ['2019-03-20'],
-  'kunitoki/clang-9'       => ['2019-09-19'],
-  'kunitoki/clang-10'      => ['2020-03-24'],
-  'silkeh/clang:11'        => ['2020-10-12'],
-  'silkeh/clang:12'        => ['2021-04-14'],
-  'silkeh/clang:13'        => ['2021-10-04'],
-  'silkeh/clang:14'        => ['2022-03-25'],
-  'silkeh/clang:15-bullseye' => ['2022-09-06'],
-  'silkeh/clang:16-bullseye' => ['2023-03-17'],
-  'silkeh/clang:17-bullseye' => ['2023-09-09'],
-  'silkeh/clang:18-bullseye' => ['2024-03-08'],
-  'silkeh/clang:19-bullseye' => ['2024-09-17'],
-  'silkeh/clang:20-bullseye' => ['2025-03-04'],
-  'silkeh/clang:21'        => ['2025-08-26'],
-  'silkeh/clang:22'        => ['2026-02-24'],
-  'teeks99/clang-ubuntu:23' => ['2026-08-25'],
+  'teeks99/clang-ubuntu:3.4' => ['2014-01-06'],
+  'teeks99/clang-ubuntu:3.6' => ['2015-02-27', 'clang-3.6'],
+  'teeks99/clang-ubuntu:3.9' => ['2016-09-02', 'clang-3.9'],
+  'teeks99/clang-ubuntu:4'   => ['2017-03-13', 'clang-4.0'],
+  'teeks99/clang-ubuntu:5'   => ['2017-09-07', 'clang-5.0'],
+  'teeks99/clang-ubuntu:6'   => ['2018-03-08', 'clang-6.0'],
+  'teeks99/clang-ubuntu:7'   => ['2018-09-19'],
+  'teeks99/clang-ubuntu:8'   => ['2019-03-20'],
+  'teeks99/clang-ubuntu:9'   => ['2019-09-19'],
+  'teeks99/clang-ubuntu:10'  => ['2020-03-24'],
+  'teeks99/clang-ubuntu:11'  => ['2020-10-12'],
+  'teeks99/clang-ubuntu:12'  => ['2021-04-14'],
+  'teeks99/clang-ubuntu:13'  => ['2021-10-04'],
+  'teeks99/clang-ubuntu:14'  => ['2022-03-25'],
+  'teeks99/clang-ubuntu:15'  => ['2022-09-06'],
+  'teeks99/clang-ubuntu:16'  => ['2023-03-17'],
+  'teeks99/clang-ubuntu:17'  => ['2023-09-19'],
+  'teeks99/clang-ubuntu:18'  => ['2024-03-06'],
+  'teeks99/clang-ubuntu:19'  => ['2024-09-17'],
+  'teeks99/clang-ubuntu:20'  => ['2025-03-04'],
+  'teeks99/clang-ubuntu:21'  => ['2025-08-26'],
+  'teeks99/clang-ubuntu:22'  => ['2026-02-24'],
+  'teeks99/clang-ubuntu:23'  => ['2026-08-25'],
 }
 
 OPT_FLAGS = ["-O0", "-O1", "-O2", "-O3", "-Os", "-Oz", "-Ofast", "-O3 -march=native"]
@@ -60,8 +62,9 @@ def clean_version(raw)
   end
 end
 
-def run_one(image, flags)
-  cc = image.include?('gcc') ? 'gcc' : 'clang'
+def run_one(image, flags, cmd = nil)
+  cc = cmd
+  cc ||= image.include?('gcc') ? 'gcc' : 'clang'
 
   cmd = <<~SH
     cd /app
@@ -131,9 +134,9 @@ end
 array = []
 
 envs = []
-COMPILERS.each do |image, (date)|
+COMPILERS.each do |image, (date, cmd)|
   OPT_FLAGS.each do |flags|
-    envs << [image, date, flags]
+    envs << [image, date, flags, cmd]
   end
 end
 
@@ -141,9 +144,9 @@ if ARGV[0] == "1"
   envs.shuffle!
 end
 
-envs.each_with_index do |(image, date, flags), index|
+envs.each_with_index do |(image, date, flags, cmd), index|
   print "[#{index + 1} from #{envs.size}] #{image}: #{flags} ... "
-  res = run_one(image, flags)
+  res = run_one(image, flags, cmd)
   unless res
     puts "[ERROR]"
     next
