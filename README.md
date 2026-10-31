@@ -83,7 +83,6 @@ docker run --rm -v `pwd`:/src -w /src gcc:16 bash -c 'time gcc -O3 index.c -lm -
 real  0m4.661s
 
 This is also confirmed by this source: https://github.com/lac-dcc/BenchGen/wiki/Comparing-gcc-versions#1 `Comparing version 5 and version 14, there is an increase of about 42% over a span of 9 years.`
-+real  0m4.661s
 
 It's also worth noting that `index.c` is a large (500 KB) amalgamated file. GCC may struggle with this kind of use case, which is actually not typical. This was not tested on smaller files - that is material for another experiment.
 
