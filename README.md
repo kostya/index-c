@@ -121,6 +121,46 @@ The tested processor came out in 2019, but the effect of `-march=native` only st
 * [reproduce script](https://github.com/kostya/index-c/blob/master/experiment/run.rb)
 * [raw data](https://github.com/kostya/index-c/blob/master/experiment/merged.js)
 
+# Experiment2: Compare C compilers on index.c
+
+```
+clang     : clang version 23.1.5
+gcc       : gcc (GCC) 16.2.1 20260810
+tcc       : tcc version 0.9.28rc 2026-01-17 makepkg@b39cbc70 (x86_64 Linux)
+cproc     : d1c53ddf
+zig       : 0.17.1
+mycc      : mycc 0.13.0-a00f054 c11-like compiler (backend: unknown) (https://github.com/kostya/myc)
+antcc     : antcc version 0.4.7-4-gcd7c80c
+madc      : madc 0.106.1
+```
+
+| Compiler | Backend | Flags | Compile (s) | Run (s) | Status |
+|----------|---------|-------|-------------|---------|--------|
+| gcc | - | -O0 | 0.8071 | 132.7883 | OK |
+| gcc | - | -O1 | 1.8752 | 57.2677 | OK |
+| gcc | - | -O2 | 3.6452 | 52.3576 | OK |
+| gcc | - | -O3 | 4.7808 | 50.5865 | OK |
+| clang | - | -O0 | 0.3434 | 142.3183 | OK |
+| clang | - | -O1 | 1.6552 | 53.911 | OK |
+| clang | - | -O2 | 2.0434 | 51.2614 | OK |
+| clang | - | -O3 | 2.0987 | 51.2867 | OK |
+| zig-cc | - | -O3 | 2.9528 | 53.8927 | OK |
+| tcc | - | (default) | 0.0208 | 147.7219 | OK |
+| cproc | qbe | (default) | 0.2068 | 89.001 | OK |
+| antcc | - | -O0 | 0.0694 | 132.4988 | OK |
+| antcc | - | -O3 | 0.0844 | 74.2026 | OK |
+| madc | - | -O0 | 0.5937 | 120.8796 | OK |
+| madc | - | -O1 | 0.6301 | 105.7359 | OK |
+| madc | - | -O2 | 0.7064 | 95.2928 | OK |
+| mycc | llvm | (default) | 1.2673 | 60.5642 | OK |
+| mycc | llvm | --final | 2.4541 | 51.9651 | OK |
+| mycc | c | (default) | 2.3358 | 56.8405 | OK |
+| mycc | c | --final | 3.0562 | 52.711 | OK |
+| mycc | gm | (default) | 0.693 | 58.1035 | OK |
+| mycc | gm | --final | 0.8034 | 52.803 | OK |
+| mycc | qbe | (default) | 0.6859 | 77.6846 | OK |
+
+![plot](https://raw.githubusercontent.com/kostya/stuff/master/index-c/experiment2_plot1.png)
 
 # Related
 
