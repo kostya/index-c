@@ -50,6 +50,20 @@ for line in lines[2:]:
     name = ' '.join(label_parts)
     data.append((name, compile_time, runtime))
 
+def pareto_front(points):
+    ordered = sorted(points, key=lambda p: (p[1], p[2]))
+    front, best_y = [], float('inf')
+    for p in ordered:
+        if p[2] < best_y:
+            front.append(p)
+            best_y = p[2]
+    return front
+
+pareto = pareto_front(data)
+px = [p[1] for p in pareto]
+py = [p[2] for p in pareto]
+print('Pareto front:', [n for n, _, _ in pareto])
+
 colors = [
     '#FF6B6B', '#FF8E8E',
     '#FFA07A', '#FFB347',
@@ -86,6 +100,13 @@ ax.set_ylim(45, 160)
 
 ax.set_xlim(-0.1, 5.2)
 
+PARETO_COLOR = '#F1C40F'
+ax.plot(px, py, linestyle='--', color=PARETO_COLOR,
+        linewidth=1.6, alpha=0.9, zorder=4)
+for x, y in zip(px, py):
+    ax.scatter(x, y, s=420, facecolors='none',
+               edgecolors=PARETO_COLOR, linewidth=2, zorder=5)
+
 for i, (x, y, label) in enumerate(zip(x_coords, y_coords, labels)):
     if i % 2 == 0:
         offset, va = (0, 14), 'bottom'
@@ -114,6 +135,8 @@ for i, (name, _, _) in enumerate(data):
     legend_elements.append(Line2D([0], [0], marker='o', color='w',
                                   markerfacecolor=colors[i % len(colors)],
                                   markersize=10, label=name))
+legend_elements.append(Line2D([0], [0], linestyle='--', color=PARETO_COLOR,
+                              linewidth=1.6, label='Pareto front'))
 
 ax.legend(handles=legend_elements, loc='upper right', facecolor='#2d2d44',
           edgecolor='gray', labelcolor='white', fontsize=9, ncol=1)
@@ -124,4 +147,3 @@ ax.set_title('C compilers on index-c benchmark: compile time vs. runtime for ind
 plt.tight_layout()
 plt.savefig('experiment2_plot1.png', dpi=150, facecolor='#1a1a2e', bbox_inches='tight')
 plt.close(fig)
-print(f"Plotted {len(data)} points.")
