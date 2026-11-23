@@ -11,8 +11,9 @@ RUN pacman -Syu --noconfirm && \
         lld \
         ruby \
         tcc \
-        zig && \
-    pacman -Scc --noconfirm
+        zig \
+        vim less mc \
+    && pacman -Scc --noconfirm
 
 ENV CC=clang
 WORKDIR /opt
@@ -56,3 +57,8 @@ RUN mkdir -p /opt/madc && \
     wget -qO- https://github.com/derekbsnider/madc/releases/download/v$madc_version/madc-$madc_version-linux-x86_64.tar.gz | \
     tar -xz -C /opt/madc --strip-components=1
 ENV PATH="/opt/madc/bin:$PATH"
+
+RUN curl -Lo mucc https://github.com/Dom-Yan/Mucc/releases/latest/download/mucc-$(uname -m)-linux \
+    && chmod +x mucc
+
+ENV PATH="/opt:$PATH"

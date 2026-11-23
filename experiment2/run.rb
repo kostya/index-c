@@ -151,6 +151,12 @@ MATRIX = [
     command: ["madc"],
     flags: %w[-O0 -O1 -O2],
     backend: 'mir',
+  },
+
+  {
+    name: "mucc",
+    command: ["mucc"],
+    flags: %w[-O0],
   }
 ]
 
