@@ -6,12 +6,11 @@ TOOLS = {
   "circle" => { command: ["circle", "--version"],      url: "https://github.com/seanbaxter/circle" },
 
   "tcc"    => { command: "tcc --version", url: "" },
-  "cproc"  => { command: "cproc --version", url: "" },
-  "mycc"   => { command: "mycc --version", url: "" },
-  "antcc"  => { command: "antcc --version", url: "" },
-  "madc"   => { command "madc --version", url: "" },
-  "zig-cc"   => { command: "zig version", url: "" },
-
+  "cproc"  => { command: "cproc --version", url: "https://github.com/michaelforney/cproc" },
+  "mycc"   => { command: "mycc --version", url: "https://github.com/kostya/myc" },
+  "antcc"  => { command: "antcc --version", url: "https://codeberg.org/lsof/antcc" },
+  "madc"   => { command "madc --version", url: "https://github.com/derekbsnider/madc" },
+  "zig-cc"   => { command: "zig version", url: "https://ziglang.org" },
 }.freeze
 
 def executable?(name)

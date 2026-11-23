@@ -116,13 +116,15 @@ MATRIX = [
   {
     name: "clang",
     command: ["clang"],
-    flags: %w[-O0 -O1 -O2 -O3]
+    flags: %w[-O0 -O1 -O2 -O3],
+    backend: 'llvm',
   },
 
   {
     name: "zig-cc",
     command: ["zig", "cc"],
-    flags: %w[-O3]
+    flags: %w[-O0 -O3],
+    backend: 'llvm',
   },
 
   {
@@ -147,7 +149,8 @@ MATRIX = [
   {
     name: "madc",
     command: ["madc"],
-    flags: %w[-O0 -O1 -O2]
+    flags: %w[-O0 -O1 -O2],
+    backend: 'mir',
   }
 ]
 
