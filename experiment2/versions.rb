@@ -9,7 +9,7 @@ TOOLS = {
   "antcc"  => { command: "antcc --version", url: "https://codeberg.org/lsof/antcc" },
   "madc"   => { command: "madc --version", url: "https://github.com/derekbsnider/madc" },
   "zig-cc"   => { command: "zig version", url: "https://ziglang.org" },
-  "mucc"   => { command: "mucc version", url: "https://ziglang.org" },
+  "mucc"   => { command: "mucc version", url: "https://github.com/Dom-Yan/Mucc" },
 }.freeze
 
 def executable?(name)

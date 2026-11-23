@@ -117,14 +117,14 @@ MATRIX = [
     name: "clang",
     command: ["clang"],
     flags: %w[-O0 -O1 -O2 -O3],
-    backend: 'llvm',
+    backend: 'LLVM',
   },
 
   {
     name: "zig-cc",
     command: ["zig", "cc"],
     flags: %w[-O0 -O3],
-    backend: 'llvm',
+    backend: 'LLVM',
   },
 
   {
@@ -137,7 +137,7 @@ MATRIX = [
     name: "cproc",
     command: ["cproc"],
     flags: [""],
-    backend: "qbe"
+    backend: "QBE"
   },
 
   {
@@ -150,7 +150,7 @@ MATRIX = [
     name: "madc",
     command: ["madc"],
     flags: %w[-O0 -O1 -O2],
-    backend: 'mir',
+    backend: 'MIR',
   },
 
   {
@@ -161,10 +161,10 @@ MATRIX = [
 ]
 
 MYC_BACKENDS = {
-  "llvm" => [[], ["--final"]],
-  "c"    => [[], ["--final"]],
-  "gm"   => [[], ["--final"]],
-  "qbe"  => [[]]
+  "LLVM" => [[], ["--final"]],
+  "C"    => [[], ["--final"]],
+  "GM"   => [[], ["--final"]],
+  "QBE"  => [[]]
 }
 
 results = []
