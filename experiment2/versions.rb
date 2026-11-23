@@ -1,14 +1,17 @@
 #!/usr/bin/env ruby
 
 TOOLS = {
-  "clang"  => ["clang", "--version"],
-  "gcc"    => ["gcc", "--version"],
-  "tcc"    => ["tcc", "--version"],
-  "cproc"  => ["cproc", "--version"],
-  "mycc"   => ["mycc", "--version"],
-  "antcc"  => ["antcc", "--version"],
-  "madc"   => ["madc", "--version"],
-  "zig"   => ["zig", "version"]
+  "clang"  => { command: ["clang", "--version"],       url: "https://clang.llvm.org" },
+  "gcc"    => { command: ["gcc", "--version"],         url: "https://gcc.gnu.org" },
+  "circle" => { command: ["circle", "--version"],      url: "https://github.com/seanbaxter/circle" },
+
+  "tcc"    => { command: "tcc --version", url: "" },
+  "cproc"  => { command: "cproc --version", url: "" },
+  "mycc"   => { command: "mycc --version", url: "" },
+  "antcc"  => { command: "antcc --version", url: "" },
+  "madc"   => { command "madc --version", url: "" },
+  "zig-cc"   => { command: "zig version", url: "" },
+
 }.freeze
 
 def executable?(name)
@@ -17,18 +20,20 @@ def executable?(name)
   end
 end
 
-TOOLS.each do |name, command|
-  print "%-10s: " % name
+TOOLS.each do |name, info|
+  command = info[:command]
+  url     = info[:url]
 
   unless executable?(command.first)
-    puts "not found"
+    puts "* [#{name}](#{url}): `not found`"
     next
   end
 
-  output = IO.popen(command, err: [:child, :out], &:read)
+  output  = IO.popen(command, err: [:child, :out], &:read)
   version = output.lines.first&.strip
+  version = "unknown version" if version.nil? || version.empty?
 
-  puts version.nil? || version.empty? ? "unknown version" : version
+  puts "* [#{name}](#{url}): `#{version}`"
 rescue StandardError => e
-  puts "error: #{e.message}"
+  puts "* [#{name}](#{url}): `error: #{e.message}`"
 end
