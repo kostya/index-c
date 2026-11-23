@@ -4,12 +4,11 @@ TOOLS = {
   "clang"  => { command: ["clang", "--version"],       url: "https://clang.llvm.org" },
   "gcc"    => { command: ["gcc", "--version"],         url: "https://gcc.gnu.org" },
   "circle" => { command: ["circle", "--version"],      url: "https://github.com/seanbaxter/circle" },
-
-  "tcc"    => { command: "tcc --version", url: "" },
+  "tcc"    => { command: "tcc --version", url: "https://bellard.org/tcc/" },
   "cproc"  => { command: "cproc --version", url: "https://github.com/michaelforney/cproc" },
   "mycc"   => { command: "mycc --version", url: "https://github.com/kostya/myc" },
   "antcc"  => { command: "antcc --version", url: "https://codeberg.org/lsof/antcc" },
-  "madc"   => { command "madc --version", url: "https://github.com/derekbsnider/madc" },
+  "madc"   => { command: "madc --version", url: "https://github.com/derekbsnider/madc" },
   "zig-cc"   => { command: "zig version", url: "https://ziglang.org" },
 }.freeze
 
