@@ -157,7 +157,15 @@ MATRIX = [
     name: "mucc",
     command: ["mucc"],
     flags: %w[-O0],
-  }
+  }, 
+
+  {
+    name: "cppgm",
+    command: ["madc"],
+    flags: %w[-O0 -O1 -O2 -O3],
+    backend: 'GM',
+  },
+
 ]
 
 MYC_BACKENDS = {
