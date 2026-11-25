@@ -1,8 +1,8 @@
 #!/usr/bin/env ruby
 
 TOOLS = {
-  "clang"  => { command: ["clang", "--version"],       url: "https://clang.llvm.org" },
-  "gcc"    => { command: ["gcc", "--version"],         url: "https://gcc.gnu.org" },
+  "clang"  => { command: "clang", "--version",       url: "https://clang.llvm.org" },
+  "gcc"    => { command: "gcc", "--version",         url: "https://gcc.gnu.org" },
   "tcc"    => { command: "tcc --version", url: "https://bellard.org/tcc/" },
   "cproc"  => { command: "git -C /opt/cproc rev-parse --short HEAD", url: "https://github.com/michaelforney/cproc" },
   "mycc"   => { command: "mycc --version", url: "https://github.com/kostya/myc" },
@@ -23,7 +23,7 @@ TOOLS.each do |name, info|
   command = info[:command]
   url     = info[:url]
 
-  unless executable?(command.first)
+  unless executable?(command)
     puts "* [#{name}](#{url}): `not found`"
     next
   end
