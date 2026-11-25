@@ -32,7 +32,7 @@ RUN git clone https://github.com/kostya/myc.git
 
 ENV PATH="/opt/myc:${PATH}"
 
-ARG gm_version="0.10.3"
+ARG gm_version="0.11.1"
 RUN mkdir -p /opt/myc/plugins/cppgm && \
     wget -qO- https://github.com/vishvananda/cppgm/releases/download/v${gm_version}/cppgm-v${gm_version}-linux-x86_64.tar.gz | \
     tar -xz -C /opt/myc/plugins/cppgm --strip-components=1

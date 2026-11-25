@@ -10,6 +10,7 @@ TOOLS = {
   "madc"   => { command: "madc --version", url: "https://github.com/derekbsnider/madc" },
   "zig-cc"   => { command: "zig version", url: "https://ziglang.org" },
   "mucc"   => { command: "mucc version", url: "https://github.com/Dom-Yan/Mucc" },
+  "cppgm"   => { command: "cppgm --version", url: "https://github.com/vishvananda/cppgm" },
 }.freeze
 
 def executable?(name)
