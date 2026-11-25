@@ -5,29 +5,34 @@ from matplotlib.lines import Line2D
 markdown = """
 | Compiler | Backend | Flags | Compile (s) | Run (s) | Status |
 |----------|---------|-------|-------------|---------|--------|
-| gcc | - | -O0 | 0.8071 | 132.7883 | OK |
-| gcc | - | -O1 | 1.8752 | 57.2677 | OK |
-| gcc | - | -O2 | 3.6452 | 52.3576 | OK |
-| gcc | - | -O3 | 4.7808 | 50.5865 | OK |
-| clang | - | -O0 | 0.3434 | 142.3183 | OK |
-| clang | - | -O1 | 1.6552 | 53.911 | OK |
-| clang | - | -O2 | 2.0434 | 51.2614 | OK |
-| clang | - | -O3 | 2.0987 | 51.2867 | OK |
-| zig-cc | - | -O3 | 2.9528 | 53.8927 | OK |
-| tcc | - | (default) | 0.0208 | 147.7219 | OK |
-| cproc | qbe | (default) | 0.2068 | 89.001 | OK |
-| antcc | - | -O0 | 0.0694 | 132.4988 | OK |
-| antcc | - | -O3 | 0.0844 | 74.2026 | OK |
-| madc | - | -O0 | 0.5937 | 120.8796 | OK |
-| madc | - | -O1 | 0.6301 | 105.7359 | OK |
-| madc | - | -O2 | 0.7064 | 95.2928 | OK |
-| mycc | llvm | (default) | 1.2673 | 60.5642 | OK |
-| mycc | llvm | --final | 2.4541 | 51.9651 | OK |
-| mycc | c | (default) | 2.3358 | 56.8405 | OK |
-| mycc | c | --final | 3.0562 | 52.711 | OK |
-| mycc | gm | (default) | 0.693 | 58.1035 | OK |
-| mycc | gm | --final | 0.8034 | 52.803 | OK |
-| mycc | qbe | (default) | 0.6859 | 77.6846 | OK |
+| gcc | - | -O0 | 0.7507 | 132.7446 | OK |
+| gcc | - | -O1 | 1.8708 | 57.3448 | OK |
+| gcc | - | -O2 | 3.6382 | 52.1492 | OK |
+| gcc | - | -O3 | 4.7649 | 50.5582 | OK |
+| clang | LLVM | -O0 | 0.3468 | 142.7883 | OK |
+| clang | LLVM | -O1 | 1.6639 | 54.0931 | OK |
+| clang | LLVM | -O2 | 2.0476 | 51.1437 | OK |
+| clang | LLVM | -O3 | 2.0862 | 51.3251 | OK |
+| zig-cc | LLVM | -O3 | 2.8599 | 53.9506 | OK |
+| tcc | - | (default) | 0.0207 | 147.9381 | OK |
+| cproc | QBE | (default) | 0.203 | 88.9362 | OK |
+| antcc | - | -O0 | 0.0702 | 131.1418 | OK |
+| antcc | - | -O3 | 0.0854 | 74.2476 | OK |
+| madc | MIR | -O0 | 0.5879 | 120.9439 | OK |
+| madc | MIR | -O1 | 0.6291 | 105.7785 | OK |
+| madc | MIR | -O2 | 0.7044 | 95.2722 | OK |
+| mucc | - | -O0 | 0.1734 | 223.8188 | OK |
+| cppgm | GM | -O0 | 0.592 | 121.0911 | OK |
+| cppgm | GM | -O1 | 0.6287 | 105.8937 | OK |
+| cppgm | GM | -O2 | 0.7068 | 95.2613 | OK |
+| cppgm | GM | -O3 | 0.7066 | 95.0949 | OK |
+| mycc | LLVM | (default) | 1.2636 | 60.8043 | OK |
+| mycc | LLVM | --final | 2.4311 | 51.9936 | OK |
+| mycc | C | (default) | 2.3307 | 57.0358 | OK |
+| mycc | C | --final | 3.0653 | 52.6486 | OK |
+| mycc | GM | (default) | 0.6971 | 57.4345 | OK |
+| mycc | GM | --final | 0.81 | 52.6276 | OK |
+| mycc | QBE | (default) | 0.6802 | 77.5978 | OK |
 """
 
 lines = markdown.strip().split('\n')
@@ -108,7 +113,7 @@ for x, y in zip(px, py):
                edgecolors=PARETO_COLOR, linewidth=2, zorder=5)
 
 for i, (x, y, label) in enumerate(zip(x_coords, y_coords, labels)):
-    if i % 2 == 0:
+    if i % 2 == 1:
         offset, va = (0, 14), 'bottom'
     else:
         offset, va = (0, -14), 'top'

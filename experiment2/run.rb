@@ -123,7 +123,7 @@ MATRIX = [
   {
     name: "zig-cc",
     command: ["zig", "cc"],
-    flags: %w[-O0 -O3],
+    flags: %w[-O3],
     backend: 'LLVM',
   },
 
