@@ -20,10 +20,10 @@ def executable?(name)
 end
 
 TOOLS.each do |name, info|
-  command = info[:command]
+  command = info[:command].split(" ")
   url     = info[:url]
 
-  unless executable?(command)
+  unless executable?(command.first)
     puts "* [#{name}](#{url}): `not found`"
     next
   end
