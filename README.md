@@ -123,6 +123,13 @@ The tested processor came out in 2019, but the effect of `-march=native` only st
 
 # Experiment2: Compare C compilers on index.c
 
+Environment:
+
+- **CPU:** Ryzen 3800X
+- **RAM:** 78 GB DDR4-3200
+- **OS:** Linux arch 7.2.7
+- **Docker:** 29.8.1
+
 * [clang](https://clang.llvm.org): `clang version 23.1.5`
 * [gcc](https://gcc.gnu.org): `gcc (GCC) 16.2.1 20260810`
 * [tcc](https://bellard.org/tcc/): `tcc version 0.9.28rc 2026-01-17 makepkg@b39cbc70 (x86_64 Linux)`
